@@ -1,0 +1,1134 @@
+{
+  "version": 1,
+  "articles": [
+    {
+      "id": "art-001",
+      "slug": "how-to-write-a-professional-staff-nurse-resume",
+      "title": "How to Write a Professional Staff Nurse Resume (With Real Clinical Examples)",
+      "excerpt": "Step-by-step guide to writing a high-impact Staff Nurse resume that passes hospital ATS filters, highlights patient care ratios, and proves clinical competency.",
+      "featured_image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&auto=format&fit=crop&q=80",
+      "author_name": "Dr. Sarah Jenkins, RN, DNP",
+      "author_role": "Clinical Healthcare Editorial Lead",
+      "published_at": "2026-02-10T08:00:00.000Z",
+      "last_updated": "2026-02-14T10:30:00.000Z",
+      "updated_at": "2026-02-14T10:30:00.000Z",
+      "created_at": "2026-02-10T08:00:00.000Z",
+      "status": "published",
+      "meta_title": "Staff Nurse Resume Guide: Formatting, Clinical Bullet Points & Templates",
+      "meta_description": "Learn how to craft a standout Staff Nurse resume with clinical experience bullets, BLS/ACLS licenses, and ATS-compliant healthcare formatting.",
+      "canonical_url": "/career-resources/how-to-write-a-professional-staff-nurse-resume",
+      "og_title": "How to Write a Professional Staff Nurse Resume",
+      "og_description": "Actionable clinical resume writing guide for registered staff nurses.",
+      "og_image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&auto=format&fit=crop&q=80",
+      "industry_id": "ind_healthcare",
+      "department_id": "dep_nursing",
+      "job_role_id": "r_029",
+      "topic_ids": [
+        "top-resume",
+        "top-skills"
+      ],
+      "tags": [
+        "Nursing",
+        "Healthcare",
+        "Resume Writing",
+        "Staff Nurse",
+        "Clinical Care"
+      ],
+      "is_featured": true,
+      "is_indexable": true,
+      "read_time": "6 min read",
+      "salary_range": "₹3,50,000 - ₹8,50,000 / $65,000 - $95,000",
+      "key_takeaways": [
+        "Structure your nursing summary with your licensure (RN/GNM/BSc), years of acute care experience, and clinical specialty.",
+        "Quantify your patient workload (e.g., \"Managed 6-8 acute medical-surgical patients per 12-hour shift\").",
+        "Feature certifications (BLS, ACLS, PALS) prominently right near the top of the first page.",
+        "Explicitly list your Electronic Health Record (EHR) proficiencies like Epic, Cerner, or Meditech."
+      ],
+      "responsibilities": [
+        "Administering prescribed intravenous medications, infusions, and blood products with strict double-verification protocols.",
+        "Conducting comprehensive physical assessments, vital sign trending, and rapid triage upon acute deterioration.",
+        "Operating life-monitoring machinery including telemetry, infusion pumps, and non-invasive ventilators.",
+        "Educating patients and family members on post-operative care, wound dressings, and home medication compliance."
+      ],
+      "required_skills": [
+        "Intravenous (IV) Therapy & Phlebotomy",
+        "Electronic Health Records (Epic / Cerner)",
+        "ACLS / BLS Certified Clinical Safety",
+        "Patient Triage & Vitals Monitoring",
+        "Aseptic Sterile Technique & Wound Management"
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you prioritize your patient assignments during an unexpected emergency on the ward?",
+          "tip": "Highlight the ABC (Airway, Breathing, Circulation) triage methodology and clear communication with the charge nurse and nursing assistants."
+        },
+        {
+          "question": "Describe a situation where a patient had an adverse reaction to a medication. What immediate actions did you take?",
+          "tip": "Showcase calm clinical protocol: stopping the infusion immediately, assessing vitals, calling for doctor support, and thorough charting."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "What is the best format for a nursing resume?",
+          "answer": "A reverse-chronological format is universally preferred by hospital hiring committees because it clearly tracks clinical rotations and recent bedside experience."
+        }
+      ],
+      "content": "A staff nurse resume must balance compassion with clinical precision. Hospital hiring managers and Applicant Tracking Systems (ATS) scan hundreds of profiles looking for verified nursing licensure, emergency certifications, and demonstrated bedside competence.\n\n### 1. The Power of a Clinical Summary Statement\nYour opening summary should immediately establish your credentials, specialty background, and patient care capabilities. Avoid generic statements like \"Hardworking nurse seeking opportunity.\" Instead, use structured metrics:\n\n* **Example**: *\"Dedicated Registered Nurse with 5+ years of bedside experience in fast-paced 40-bed medical-surgical and step-down units. Certified in ACLS and BLS with proven expertise in Epic EHR documentation and post-operative telemetry monitoring.\"*\n\n### 2. Crafting Impactful Clinical Experience Bullets\nDo not simply list routine job descriptions. Quantify your patient load, clinical interventions, and safety records:\n\n* Spearheaded daily bedside care, medication administration, and IV therapy for 6-8 acute patients per shift while maintaining a 100% medication safety record.\n* Partnered with multidisciplinary care teams comprising 12+ physicians, pharmacists, and respiratory therapists to formulate individualized discharge care plans.\n* Reduced hospital-acquired infection (HAI) rates in assigned wing by 22% through strict adherence to aseptic protocols and hand hygiene auditing.\n\n### 3. Highlighting Technical proficiencies & EHR Systems\nModern hospitals require deep comfort with medical informatics. Ensure your technical skills section highlights specific medical hardware and EHR platforms (Epic, Cerner, Meditech, McKesson).\n\n### 4. Licensure & Certifications Placement\nAlways list your primary Nursing License number, state/country of registration, and expiration dates clearly on the first page alongside your BLS, ACLS, or specialty certifications."
+    },
+    {
+      "id": "art-002",
+      "slug": "top-10-electrical-technician-interview-questions-and-answers",
+      "title": "Top 10 Electrical Technician Interview Questions & Practical Answers",
+      "excerpt": "Master your next commercial or industrial electrician interview with these real technical questions, troubleshooting scenarios, and safety-first explanations.",
+      "featured_image": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&auto=format&fit=crop&q=80",
+      "author_name": "Marcus Vance, Master Electrician",
+      "author_role": "Industrial Engineering Consultant",
+      "published_at": "2026-02-05T09:00:00.000Z",
+      "last_updated": "2026-02-12T14:00:00.000Z",
+      "updated_at": "2026-02-12T14:00:00.000Z",
+      "created_at": "2026-02-05T09:00:00.000Z",
+      "status": "published",
+      "meta_title": "Top 10 Electrical Technician Interview Questions & Practical Answers",
+      "meta_description": "Prepare for maintenance electrician and technician interviews with step-by-step troubleshooting walkthroughs, safety standards, and wiring questions.",
+      "canonical_url": "/career-resources/top-10-electrical-technician-interview-questions-and-answers",
+      "og_title": "Top 10 Electrical Technician Interview Questions & Answers",
+      "og_description": "Real-world technical questions and safety protocols for electrical job interviews.",
+      "og_image": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1200&auto=format&fit=crop&q=80",
+      "industry_id": "ind_construction",
+      "department_id": "dep_building_trades",
+      "job_role_id": "r_002",
+      "topic_ids": [
+        "top-interview",
+        "top-skills"
+      ],
+      "tags": [
+        "Electrical",
+        "Construction",
+        "Interview Prep",
+        "Technician",
+        "Safety"
+      ],
+      "is_featured": true,
+      "is_indexable": true,
+      "read_time": "7 min read",
+      "salary_range": "₹2,80,000 - ₹6,00,000 / $48,000 - $78,000",
+      "key_takeaways": [
+        "Always lead with safety: Lockout/Tagout (LOTO) protocols and PPE before discussing tool work.",
+        "Demonstrate structured multimeter diagnostic workflows rather than guessing issues.",
+        "Explain single-phase vs three-phase power distribution and balancing electrical loads.",
+        "Know your local National Electrical Code (NEC) regulations and breaker sizing standards."
+      ],
+      "responsibilities": [
+        "Troubleshooting, repairing, and installing electrical wiring, conduit systems, and main breaker panels.",
+        "Reading and interpreting complex electrical schematics, one-line diagrams, and blueprint layouts.",
+        "Executing preventative maintenance on industrial motors, transformers, and automated switchboards.",
+        "Enforcing strict Lockout/Tagout (LOTO) and arc flash safety protocols on job sites."
+      ],
+      "required_skills": [
+        "Lockout/Tagout (LOTO) & OSHA / HSE Safety",
+        "Multimeter & Megger Insulation Testing",
+        "Conduit Bending & Panel Board Wiring",
+        "Three-Phase Motor Troubleshooting",
+        "Electrical Blueprint & Schematic Reading"
+      ],
+      "interview_questions": [
+        {
+          "question": "What is the very first step you take before touching any de-energized electrical panel?",
+          "tip": "Emphasize the zero-energy verification step: Apply LOTO, use a calibrated multimeter to test live-dead-live verification before touching."
+        },
+        {
+          "question": "How do you troubleshoot an electric motor that repeatedly trips its thermal overload breaker?",
+          "tip": "Explain checking motor current draw with a clamp meter, testing winding insulation resistance with a megohmmeter, and verifying mechanical bearing load."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "What safety gear is mandatory for an electrical interview assessment?",
+          "answer": "Expect questions regarding Category-rated multimeter usage, arc-rated gloves, safety glasses, and insulated hand tools tested to 1000V standards."
+        }
+      ],
+      "content": "When interviewing for an electrical technician role, technical knowledge alone is not enough—hiring managers want to verify that you prioritize safety, understand electrical code compliance, and can methodically diagnose faults without creating downtime.\n\n### 1. The Core Philosophy: Safety and LOTO First\nNever answer a technical troubleshooting question without first mentioning your safety precautions. Interviewers frequently use scenario questions to test if you cut corners.\n\n### 2. Common Technical Questions Asked by Employers\n* **Question**: *How do you perform a live-dead-live voltage test?*\n  * **Answer Formula**: Test the multimeter on a known live source, verify zero voltage on the de-energized target equipment, and immediately re-test the multimeter on the live source to prove the meter did not fail open.\n* **Question**: *What causes high harmonic distortion in industrial power systems, and how do you mitigate it?*\n  * **Answer Formula**: Variable frequency drives (VFDs) and non-linear switching power supplies generate harmonic currents. Mitigation involves passive harmonic filters, isolation transformers, and active line conditioners.\n\n### 3. Communicating with Non-Technical Stakeholders\nMaintenance technicians regularly interact with plant managers and facility owners. Frame your answers around minimizing operational downtime while ensuring zero compliance risk."
+    },
+    {
+      "id": "art-003",
+      "slug": "software-engineer-career-growth-from-junior-to-staff",
+      "title": "Software Engineer Career Progression: The Roadmap from Junior to Staff Engineer",
+      "excerpt": "Detailed compensation bands, technical scope expectations, and leadership milestones across every engineering tier from entry-level to Staff+.",
+      "featured_image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&auto=format&fit=crop&q=80",
+      "author_name": "Alex Rivera",
+      "author_role": "Principal Systems Architect",
+      "published_at": "2026-01-28T10:00:00.000Z",
+      "last_updated": "2026-02-10T12:00:00.000Z",
+      "updated_at": "2026-02-10T12:00:00.000Z",
+      "created_at": "2026-01-28T10:00:00.000Z",
+      "status": "published",
+      "meta_title": "Software Engineer Career Path: Junior, Mid, Senior, and Staff Guide",
+      "meta_description": "Understand the distinct engineering levels, expectations, architectural ownership, and salary growth from Junior to Staff Software Engineer.",
+      "canonical_url": "/career-resources/software-engineer-career-growth-from-junior-to-staff",
+      "og_title": "Software Engineer Career Progression: Junior to Staff",
+      "og_description": "Strategic engineering career ladder breakdown with actionable promotion benchmarks.",
+      "og_image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&auto=format&fit=crop&q=80",
+      "industry_id": "ind_it",
+      "department_id": "dep_software_dev",
+      "job_role_id": "r_073",
+      "topic_ids": [
+        "top-career-growth",
+        "top-salary"
+      ],
+      "tags": [
+        "Software Engineering",
+        "Tech Careers",
+        "Career Ladder",
+        "Staff Engineer",
+        "Architecture"
+      ],
+      "is_featured": true,
+      "is_indexable": true,
+      "read_time": "8 min read",
+      "salary_range": "₹6,00,000 - ₹45,00,000+ / $90,000 - $280,000+",
+      "key_takeaways": [
+        "Junior engineers focus on execution and learning; Senior engineers own system reliability and team mentorship.",
+        "Staff engineers shift focus from individual coding to cross-team architectural alignment and business impact.",
+        "Technical writing (RFCs, design docs, incident postmortems) becomes the primary multiplier at higher tiers.",
+        "Promotion requires demonstrating sustained performance at the target level before the formal title change."
+      ],
+      "responsibilities": [
+        "Designing scalable, fault-tolerant backend microservices and responsive web applications.",
+        "Authoring comprehensive Architecture Decision Records (ADRs) and Request for Comments (RFCs).",
+        "Conducting rigorous code reviews, mentoring junior engineers, and establishing testing benchmarks.",
+        "Collaborating with product managers and infrastructure teams on quarterly technical roadmaps."
+      ],
+      "required_skills": [
+        "Distributed Systems & Cloud Architecture (AWS/GCP)",
+        "TypeScript / Python / Go / Rust / Java",
+        "System Design & Microservices Decomposition",
+        "CI/CD Pipelines & Automated Testing",
+        "Technical RFC Authoring & Engineering Mentorship"
+      ],
+      "interview_questions": [
+        {
+          "question": "How do you decide between building a monolithic application vs a microservice architecture?",
+          "tip": "Discuss team size, domain boundary maturity, deployment velocity, operational complexity, and network latency tradeoffs."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "What is the main difference between Senior and Staff engineers?",
+          "answer": "Senior engineers maximize the output of a single project or squad. Staff engineers influence multiple teams, resolve cross-domain ambiguities, and set long-term technical direction."
+        }
+      ],
+      "content": "Navigating the software engineering career ladder requires transforming from an individual task executor into an organizational force multiplier.\n\n### The Engineering Tiers Demystified\n\n#### 1. Junior Software Engineer (0–2 Years)\n* **Primary Focus**: High execution velocity on well-scoped tickets, mastering codebase conventions, and absorbing feedback during code reviews.\n* **Growth Lever**: Ask structured questions, write thorough unit tests, and independently debug stack traces before escalating.\n\n#### 2. Mid-Level Software Engineer (2–5 Years)\n* **Primary Focus**: Autonomous ownership of end-to-end features, identifying edge cases, and minimizing regression risks.\n* **Growth Lever**: Begin drafting technical design proposals for non-trivial feature sets.\n\n#### 3. Senior Software Engineer (5–8+ Years)\n* **Primary Focus**: Owning system architecture, mentoring junior engineers, driving code review standards, and proactively reducing technical debt.\n* **Growth Lever**: Drive blameless postmortems and establish observability standards.\n\n#### 4. Staff Software Engineer (8+ Years)\n* **Primary Focus**: Setting technical strategy across multiple engineering squads, driving cross-organizational RFCs, and aligning technical roadmaps with business revenue goals."
+    }
+  ],
+  "topics": [
+    {
+      "id": "top-resume",
+      "name": "Resume & CV Writing",
+      "slug": "resume-cv-writing",
+      "description": "Expert frameworks, formatting rules, ATS strategies, and real-world bullet-point samples.",
+      "iconName": "FileText",
+      "seo_title": "Resume & CV Writing Guides for Global Professionals",
+      "meta_description": "Actionable resume templates, ATS optimization guides, and step-by-step CV writing advice.",
+      "is_indexable": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "top-interview",
+      "name": "Interview Preparation",
+      "slug": "interview-preparation",
+      "description": "Technical questions, behavioral response frameworks (STAR), and hiring manager expectations.",
+      "iconName": "HelpCircle",
+      "seo_title": "Job Interview Preparation & Technical Question Guides",
+      "meta_description": "Ace technical and behavioral job interviews with structured sample questions and scoring rubrics.",
+      "is_indexable": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "top-career-growth",
+      "name": "Career Progression",
+      "slug": "career-progression",
+      "description": "Promotions, department transitions, leadership paths, and executive roadmap planning.",
+      "iconName": "TrendingUp",
+      "seo_title": "Career Progression & Professional Growth Roadmaps",
+      "meta_description": "Strategic roadmaps for climbing from entry-level to senior leadership across key global industries.",
+      "is_indexable": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "top-salary",
+      "name": "Salary & Compensation",
+      "slug": "salary-compensation",
+      "description": "Global benchmark compensation bands, negotiation frameworks, and equity breakdowns.",
+      "iconName": "DollarSign",
+      "seo_title": "Salary Benchmarks & Compensation Guides Worldwide",
+      "meta_description": "Compare regional salary ranges, perks, and negotiation tactics for top professions.",
+      "is_indexable": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "top-skills",
+      "name": "Skills & Certifications",
+      "slug": "skills-certifications",
+      "description": "Crucial hard and soft competencies, international licenses, and certification paths.",
+      "iconName": "Award",
+      "seo_title": "In-Demand Skills & Industry Certifications",
+      "meta_description": "Discover the most in-demand technical certifications and workplace skills employers look for.",
+      "is_indexable": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "top-workplace",
+      "name": "Workplace & Culture",
+      "slug": "workplace-culture",
+      "description": "Onboarding, remote work etiquette, workplace safety, and team leadership best practices.",
+      "iconName": "Briefcase",
+      "seo_title": "Workplace Best Practices & Modern Team Culture",
+      "meta_description": "Guides on workplace safety, remote collaboration, team dynamics, and productive work cultures.",
+      "is_indexable": true,
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "career_guides": [],
+  "candidates": [
+    {
+      "id": "cand-audit-user-B",
+      "user_id": "cand-audit-user-B",
+      "full_name": "Audit Candidate Beta",
+      "phone_number": "+1 555-0102",
+      "has_resume": false,
+      "resume_visibility": "PRIVATE",
+      "updated_at": "2026-08-15T09:23:46.305Z"
+    },
+    {
+      "id": "cand-audit-user-A",
+      "user_id": "cand-audit-user-A",
+      "full_name": "Audit Candidate Alpha",
+      "phone_number": "+1 555-0101",
+      "has_resume": false,
+      "resume_visibility": "ELIGIBLE_EMPLOYERS",
+      "updated_at": "2026-08-15T09:23:46.403Z",
+      "resume": null,
+      "privacy_settings": {
+        "resume_visibility": "ELIGIBLE_EMPLOYERS"
+      },
+      "profile_views": 1
+    },
+    {
+      "id": "cand-001",
+      "user_id": "user-001",
+      "phone_number": "+91 98765 43210",
+      "full_name": "Rajesh Kumar Verma",
+      "headline": "Senior Commercial & Heavy Vehicle Fleet Driver",
+      "photo_url": "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=400&auto=format&fit=crop&q=80",
+      "skill_category_id": "r_241",
+      "skill_category": "Personal & Chauffeur Driver",
+      "industry_id": "ind_logistics",
+      "industry_name": "Logistics, Supply Chain & Transport",
+      "department_id": "dep_fleet_driving",
+      "department_name": "Fleet Management & Transport Operations",
+      "job_role_id": "r_241",
+      "job_role_name": "Personal & Chauffeur Driver",
+      "custom_profession": null,
+      "experience_years": 5,
+      "experience_label": "5+ Years",
+      "country": "India",
+      "country_code": "IN",
+      "admin_level_1": "Delhi",
+      "admin_level_2": "New Delhi",
+      "village_or_town": "Connaught Place",
+      "area_other": "Block C",
+      "is_available": true,
+      "expected_salary": "₹25,000/month",
+      "bio": "Experienced commercial and personal driver. Clean driving record, valid heavy vehicle license, GPS navigation expert, and defensive driving certified.",
+      "skills": [
+        "Heavy Vehicle Driving",
+        "Defensive Driving",
+        "Route Planning",
+        "Vehicle Maintenance",
+        "VIP Chauffeur Services"
+      ],
+      "languages": [
+        {
+          "language": "Hindi",
+          "proficiency": "Native"
+        },
+        {
+          "language": "English",
+          "proficiency": "Conversational"
+        },
+        {
+          "language": "Punjabi",
+          "proficiency": "Fluent"
+        }
+      ],
+      "job_preferences": {
+        "employment_types": [
+          "Full-Time"
+        ],
+        "workplace_type": "On-Site",
+        "willing_to_relocate": true,
+        "notice_period_days": 0
+      },
+      "privacy_settings": {
+        "profile_visibility": "public",
+        "hide_phone_from_public": true,
+        "allow_employer_messages": true
+      },
+      "profile_views": 42,
+      "is_verified": true,
+      "is_active": true,
+      "slug": "driver-rajesh-kumar-verma-delhi-a1b2",
+      "created_at": "2026-08-05T09:12:40.162Z",
+      "updated_at": "2026-08-15T09:12:40.162Z"
+    },
+    {
+      "id": "cand-002",
+      "user_id": "user-002",
+      "phone_number": "+91 91234 56789",
+      "full_name": "Pooja Sharma",
+      "headline": "Data Entry Specialist & Office Coordinator",
+      "photo_url": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80",
+      "skill_category_id": "r_078",
+      "skill_category": "Data Entry & Office Assistant",
+      "industry_id": "ind_it",
+      "industry_name": "IT, Software, Tech & AI Services",
+      "department_id": "dep_it_ops",
+      "department_name": "IT Infrastructure, Systems & Support",
+      "job_role_id": "r_078",
+      "job_role_name": "Data Entry & Office Assistant",
+      "custom_profession": null,
+      "experience_years": 3,
+      "experience_label": "3 Years",
+      "country": "India",
+      "country_code": "IN",
+      "admin_level_1": "Punjab",
+      "admin_level_2": "Mohali",
+      "village_or_town": "Phase 7",
+      "area_other": "Industrial Area",
+      "is_available": true,
+      "expected_salary": "₹20,000/month",
+      "bio": "Detail-oriented data entry specialist. Fast typing speed (55 WPM), proficient in Excel, Google Sheets, Tally Prime, and CRM platforms.",
+      "skills": [
+        "MS Excel",
+        "Data Entry",
+        "Tally Prime",
+        "Google Workspace",
+        "Inventory Logging",
+        "Typing 55 WPM"
+      ],
+      "languages": [
+        {
+          "language": "English",
+          "proficiency": "Fluent"
+        },
+        {
+          "language": "Hindi",
+          "proficiency": "Native"
+        },
+        {
+          "language": "Punjabi",
+          "proficiency": "Native"
+        }
+      ],
+      "job_preferences": {
+        "employment_types": [
+          "Full-Time",
+          "Contract"
+        ],
+        "workplace_type": "Hybrid",
+        "willing_to_relocate": false,
+        "notice_period_days": 15
+      },
+      "privacy_settings": {
+        "profile_visibility": "public",
+        "hide_phone_from_public": true,
+        "allow_employer_messages": true
+      },
+      "profile_views": 31,
+      "is_verified": true,
+      "is_active": true,
+      "slug": "computer-operator-pooja-sharma-mohali-c3d4",
+      "created_at": "2026-08-10T09:12:40.162Z",
+      "updated_at": "2026-08-15T09:12:40.162Z"
+    },
+    {
+      "id": "cand-003",
+      "user_id": "user-003",
+      "phone_number": "+971 50 123 4567",
+      "full_name": "Mohammed Al-Mansoori",
+      "headline": "Certified Electrical Maintenance & HVAC Controls Technician",
+      "photo_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80",
+      "skill_category_id": "r_002",
+      "skill_category": "Electrical Maintenance Technician",
+      "industry_id": "ind_construction",
+      "industry_name": "Construction, Infrastructure & Real Estate",
+      "department_id": "dep_building_trades",
+      "department_name": "Building Trades & MEP Services",
+      "job_role_id": "r_002",
+      "job_role_name": "Electrical Maintenance Technician",
+      "custom_profession": null,
+      "experience_years": 7,
+      "experience_label": "5+ Years",
+      "country": "United Arab Emirates",
+      "country_code": "AE",
+      "admin_level_1": "Dubai",
+      "admin_level_2": "Deira",
+      "village_or_town": "Al Muteena",
+      "area_other": "Commercial Tower A",
+      "is_available": true,
+      "expected_salary": "5,000 AED/month",
+      "bio": "Certified electrical technician with 7 years of GCC commercial and residential infrastructure maintenance experience.",
+      "skills": [
+        "High Voltage Wiring",
+        "Circuit Troubleshooting",
+        "HVAC Panels",
+        "Preventive Maintenance",
+        "OSHA Safety"
+      ],
+      "languages": [
+        {
+          "language": "Arabic",
+          "proficiency": "Native"
+        },
+        {
+          "language": "English",
+          "proficiency": "Fluent"
+        },
+        {
+          "language": "Urdu",
+          "proficiency": "Conversational"
+        }
+      ],
+      "job_preferences": {
+        "employment_types": [
+          "Full-Time"
+        ],
+        "workplace_type": "On-Site",
+        "willing_to_relocate": true,
+        "notice_period_days": 0
+      },
+      "privacy_settings": {
+        "profile_visibility": "public",
+        "hide_phone_from_public": true,
+        "allow_employer_messages": true
+      },
+      "profile_views": 68,
+      "is_verified": true,
+      "is_active": true,
+      "slug": "electrician-mohammed-al-mansoori-dubai-e5f6",
+      "created_at": "2026-07-31T09:12:40.162Z",
+      "updated_at": "2026-08-15T09:12:40.162Z"
+    },
+    {
+      "id": "cand-004",
+      "user_id": "user-004",
+      "phone_number": "+1 415 555 0192",
+      "full_name": "Elena Rostova",
+      "headline": "Senior Full Stack TypeScript & Cloud Solutions Architect",
+      "photo_url": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80",
+      "skill_category_id": "r_072",
+      "skill_category": "Full Stack Software Engineer",
+      "industry_id": "ind_it",
+      "industry_name": "IT, Software, Tech & AI Services",
+      "department_id": "dep_software_dev",
+      "department_name": "Software Engineering & App Development",
+      "job_role_id": "r_072",
+      "job_role_name": "Full Stack Software Engineer",
+      "custom_profession": null,
+      "experience_years": 6,
+      "experience_label": "5+ Years",
+      "country": "United States",
+      "country_code": "US",
+      "admin_level_1": "California",
+      "admin_level_2": "San Francisco",
+      "village_or_town": "SoMa",
+      "area_other": "Market Street",
+      "is_available": true,
+      "expected_salary": "$135,000/year",
+      "bio": "Full stack engineer specialized in high-throughput Node.js microservices, React/Next.js architectures, GraphQL, PostgreSQL, and AWS/GCP deployments.",
+      "skills": [
+        "TypeScript",
+        "React",
+        "Node.js",
+        "PostgreSQL",
+        "Docker",
+        "Kubernetes",
+        "AWS",
+        "GraphQL"
+      ],
+      "languages": [
+        {
+          "language": "English",
+          "proficiency": "Native"
+        },
+        {
+          "language": "German",
+          "proficiency": "Conversational"
+        }
+      ],
+      "job_preferences": {
+        "employment_types": [
+          "Full-Time",
+          "Contract"
+        ],
+        "workplace_type": "Remote",
+        "willing_to_relocate": false,
+        "notice_period_days": 15
+      },
+      "privacy_settings": {
+        "profile_visibility": "public",
+        "hide_phone_from_public": true,
+        "allow_employer_messages": true
+      },
+      "profile_views": 89,
+      "is_verified": true,
+      "is_active": true,
+      "slug": "software-engineer-elena-rostova-san-francisco-g7h8",
+      "created_at": "2026-08-07T09:12:40.162Z",
+      "updated_at": "2026-08-15T09:12:40.162Z"
+    },
+    {
+      "id": "cand-005",
+      "user_id": "user-005",
+      "phone_number": "+44 20 7946 0912",
+      "full_name": "Marcus Sterling",
+      "headline": "Registered Critical Care & Surgical Nurse (BSN)",
+      "photo_url": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&auto=format&fit=crop&q=80",
+      "skill_category_id": "r_110",
+      "skill_category": "Registered Staff Nurse",
+      "industry_id": "ind_healthcare",
+      "industry_name": "Healthcare, Nursing & Medical Sciences",
+      "department_id": "dep_nursing",
+      "department_name": "Nursing, Inpatient & Clinical Care",
+      "job_role_id": "r_110",
+      "job_role_name": "Registered Staff Nurse",
+      "custom_profession": null,
+      "experience_years": 4,
+      "experience_label": "4 Years",
+      "country": "United Kingdom",
+      "country_code": "GB",
+      "admin_level_1": "England",
+      "admin_level_2": "Greater London",
+      "village_or_town": "Camden",
+      "area_other": "Bloomsbury",
+      "is_available": true,
+      "expected_salary": "£38,000/year",
+      "bio": "Dedicated Critical Care Nurse with experience in NHS and private hospital surgical wings. Patient advocacy, triage, ACLS certified.",
+      "skills": [
+        "Critical Care",
+        "Triage Assessment",
+        "Patient Care",
+        "Medication Administration",
+        "ACLS Certified",
+        "Electronic Health Records"
+      ],
+      "languages": [
+        {
+          "language": "English",
+          "proficiency": "Native"
+        },
+        {
+          "language": "French",
+          "proficiency": "Conversational"
+        }
+      ],
+      "job_preferences": {
+        "employment_types": [
+          "Full-Time",
+          "Shift-Based"
+        ],
+        "workplace_type": "On-Site",
+        "willing_to_relocate": true,
+        "notice_period_days": 30
+      },
+      "privacy_settings": {
+        "profile_visibility": "public",
+        "hide_phone_from_public": true,
+        "allow_employer_messages": true
+      },
+      "profile_views": 54,
+      "is_verified": true,
+      "is_active": true,
+      "slug": "nurse-marcus-sterling-london-i9j0",
+      "created_at": "2026-08-03T09:12:40.162Z",
+      "updated_at": "2026-08-15T09:12:40.162Z"
+    }
+  ],
+  "subscription_plans": [
+    {
+      "id": "plan-free",
+      "name": "Free Employer",
+      "slug": "free",
+      "description": "Browse candidate profiles and test search capabilities worldwide.",
+      "price": 0,
+      "currency": "USD",
+      "billing_interval": "monthly",
+      "contact_limit": 0,
+      "resume_access_limit": 0,
+      "resume_download_enabled": false,
+      "advanced_filters_enabled": false,
+      "phone_access_enabled": false,
+      "is_active": true,
+      "features": [
+        "Unlimited Candidate Search",
+        "View Full Experience & Skills",
+        "Save Up to 5 Candidates with Notes",
+        "Basic Location Filtering"
+      ],
+      "sort_order": 1
+    },
+    {
+      "id": "plan-starter",
+      "name": "Starter Employer",
+      "slug": "starter",
+      "description": "Ideal for small businesses and boutique agencies hiring selectively.",
+      "price": 29,
+      "currency": "USD",
+      "billing_interval": "monthly",
+      "contact_limit": 15,
+      "resume_access_limit": 15,
+      "resume_download_enabled": true,
+      "advanced_filters_enabled": true,
+      "phone_access_enabled": true,
+      "is_active": true,
+      "features": [
+        "Unlock 15 Direct Candidate Phone Numbers / Month",
+        "View & Download 15 Candidate Resumes / Month",
+        "Direct WhatsApp & Calling Access",
+        "Advanced Multi-Criteria Filters",
+        "Save Unlimited Candidates with Private Notes",
+        "Export Unlocked Contacts to CSV"
+      ],
+      "sort_order": 2
+    },
+    {
+      "id": "plan-pro",
+      "name": "Professional Employer",
+      "slug": "pro",
+      "description": "Best for growing companies, recruitment firms & frequent hiring needs.",
+      "price": 79,
+      "currency": "USD",
+      "billing_interval": "monthly",
+      "contact_limit": 50,
+      "resume_access_limit": 50,
+      "resume_download_enabled": true,
+      "advanced_filters_enabled": true,
+      "phone_access_enabled": true,
+      "is_active": true,
+      "features": [
+        "Unlock 50 Direct Candidate Phone Numbers / Month",
+        "View & Download 50 Candidate Resumes / Month",
+        "Priority Candidate Recommendations",
+        "Direct WhatsApp & Instant Phone Unlocks",
+        "All Advanced Location, Relocation & Salary Filters",
+        "Download Full Verified Resume Documents",
+        "Team Search Sharing & Activity Logs"
+      ],
+      "sort_order": 3
+    },
+    {
+      "id": "plan-business",
+      "name": "Business / Unlimited",
+      "slug": "business",
+      "description": "For global recruitment agencies & enterprises with high-volume hiring.",
+      "price": 199,
+      "currency": "USD",
+      "billing_interval": "monthly",
+      "contact_limit": 9999,
+      "resume_access_limit": 9999,
+      "resume_download_enabled": true,
+      "advanced_filters_enabled": true,
+      "phone_access_enabled": true,
+      "is_active": true,
+      "features": [
+        "Unlimited Direct Candidate Phone & Contact Unlocks",
+        "Unlimited Candidate Resume Views & Downloads",
+        "Dedicated Talent Matching Manager",
+        "Full Database Search & Bulk Export",
+        "Direct WhatsApp, Email & Phone Access",
+        "Custom Candidate Alerts & Webhooks",
+        "24/7 Priority Support & SLA Guarantee"
+      ],
+      "sort_order": 4
+    }
+  ],
+  "employer_profiles": [
+    {
+      "id": "emp_1786785762384_5066",
+      "user_id": "emp_usr_1786785762384",
+      "company_name": "Audit Global Corp",
+      "contact_person_name": "Audit HR Lead",
+      "phone_number": "",
+      "email": "hr@auditenterprise.com",
+      "created_at": "2026-08-15T09:22:42.384Z",
+      "updated_at": "2026-08-15T09:23:46.308Z"
+    }
+  ],
+  "employer_subscriptions": [
+    {
+      "id": "sub_1786785826311_u27ix",
+      "employer_id": "emp_1786785762384_5066",
+      "plan_id": "plan-pro",
+      "plan": {
+        "id": "plan-pro",
+        "name": "Professional Employer",
+        "slug": "pro",
+        "description": "Best for growing companies, recruitment firms & frequent hiring needs.",
+        "price": 79,
+        "currency": "USD",
+        "billing_interval": "monthly",
+        "contact_limit": 50,
+        "resume_access_limit": 50,
+        "resume_download_enabled": true,
+        "advanced_filters_enabled": true,
+        "phone_access_enabled": true,
+        "is_active": true,
+        "features": [
+          "Unlock 50 Direct Candidate Phone Numbers / Month",
+          "View & Download 50 Candidate Resumes / Month",
+          "Priority Candidate Recommendations",
+          "Direct WhatsApp & Instant Phone Unlocks",
+          "All Advanced Location, Relocation & Salary Filters",
+          "Download Full Verified Resume Documents",
+          "Team Search Sharing & Activity Logs"
+        ],
+        "sort_order": 3
+      },
+      "status": "active",
+      "started_at": "2026-08-15T09:23:46.311Z",
+      "expires_at": "2026-09-14T09:23:46.311Z",
+      "contact_unlock_limit": 50,
+      "contacts_used_this_period": 0,
+      "payment_provider": "staging_flow",
+      "provider_subscription_id": "sub_ref_1786785826311",
+      "created_at": "2026-08-15T09:23:46.311Z",
+      "updated_at": "2026-08-15T09:23:46.311Z"
+    }
+  ],
+  "saved_candidates": [],
+  "recently_viewed_candidates": [],
+  "contact_unlock_history": [],
+  "resume_access_history": [
+    {
+      "id": "res_acc_1786785762486_0he4",
+      "employer_id": "emp_1786785762384_5066",
+      "candidate_id": "cand-audit-user-A",
+      "resume_id": "res_meta_1786785762405_gkwo",
+      "action": "view",
+      "subscription_id": "sub_1786785762390_ixqzd",
+      "accessed_at": "2026-08-15T09:23:46.383Z",
+      "candidate_name_snapshot": "Audit Candidate Alpha",
+      "file_name_snapshot": "Alpha_Resume.pdf",
+      "last_action": "view"
+    }
+  ],
+  "audit_logs": [
+    {
+      "id": "aud_1786785826404_azui",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "DELETE_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "timestamp": "2026-08-15T09:23:46.404Z"
+    },
+    {
+      "id": "aud_1786785826388_ok9e",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPLOAD_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "filename": "Alpha_Updated_Resume.pdf",
+        "file_size": 107,
+        "privacy": "ELIGIBLE_EMPLOYERS"
+      },
+      "timestamp": "2026-08-15T09:23:46.388Z"
+    },
+    {
+      "id": "aud_1786785826379_o9x2",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPDATE_RESUME_PRIVACY",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "privacy": "ELIGIBLE_EMPLOYERS"
+      },
+      "timestamp": "2026-08-15T09:23:46.379Z"
+    },
+    {
+      "id": "aud_1786785826316_2ie6",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPLOAD_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "filename": "Alpha_Resume.pdf",
+        "file_size": 94,
+        "privacy": "PRIVATE"
+      },
+      "timestamp": "2026-08-15T09:23:46.316Z"
+    },
+    {
+      "id": "aud_1786785826312_wovr",
+      "actor_type": "employer",
+      "actor_id": "emp_1786785762384_5066",
+      "actor_name": "Employer Account",
+      "action": "SUBSCRIBE_PLAN",
+      "target_type": "subscription",
+      "target_id": "sub_1786785826311_u27ix",
+      "metadata": {
+        "plan_id": "plan-pro",
+        "plan_name": "Professional Employer"
+      },
+      "timestamp": "2026-08-15T09:23:46.312Z"
+    },
+    {
+      "id": "aud_1786785812251_xh73",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPLOAD_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "filename": "Alpha_Updated_Resume.pdf",
+        "file_size": 107,
+        "privacy": "ELIGIBLE_EMPLOYERS"
+      },
+      "timestamp": "2026-08-15T09:23:32.251Z"
+    },
+    {
+      "id": "aud_1786785812240_yrcs",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPDATE_RESUME_PRIVACY",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "privacy": "ELIGIBLE_EMPLOYERS"
+      },
+      "timestamp": "2026-08-15T09:23:32.240Z"
+    },
+    {
+      "id": "aud_1786785812170_6utr",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPLOAD_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "filename": "Alpha_Resume.pdf",
+        "file_size": 94,
+        "privacy": "PRIVATE"
+      },
+      "timestamp": "2026-08-15T09:23:32.170Z"
+    },
+    {
+      "id": "aud_1786785812156_wiqn",
+      "actor_type": "employer",
+      "actor_id": "emp_1786785762384_5066",
+      "actor_name": "Employer Account",
+      "action": "SUBSCRIBE_PLAN",
+      "target_type": "subscription",
+      "target_id": "sub_1786785812155_6dr49",
+      "metadata": {
+        "plan_id": "plan-pro",
+        "plan_name": "Professional Employer"
+      },
+      "timestamp": "2026-08-15T09:23:32.156Z"
+    },
+    {
+      "id": "aud_1786785807353_61o9",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "DELETE_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "timestamp": "2026-08-15T09:23:27.353Z"
+    },
+    {
+      "id": "aud_1786785807347_7oz0",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPLOAD_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "filename": "Alpha_Updated_Resume.pdf",
+        "file_size": 107,
+        "privacy": "ELIGIBLE_EMPLOYERS"
+      },
+      "timestamp": "2026-08-15T09:23:27.347Z"
+    },
+    {
+      "id": "aud_1786785807336_nre6",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPDATE_RESUME_PRIVACY",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "privacy": "ELIGIBLE_EMPLOYERS"
+      },
+      "timestamp": "2026-08-15T09:23:27.336Z"
+    },
+    {
+      "id": "aud_1786785807268_pw23",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPLOAD_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "filename": "Alpha_Resume.pdf",
+        "file_size": 94,
+        "privacy": "PRIVATE"
+      },
+      "timestamp": "2026-08-15T09:23:27.268Z"
+    },
+    {
+      "id": "aud_1786785807263_98hm",
+      "actor_type": "employer",
+      "actor_id": "emp_1786785762384_5066",
+      "actor_name": "Employer Account",
+      "action": "SUBSCRIBE_PLAN",
+      "target_type": "subscription",
+      "target_id": "sub_1786785807263_4z8w9",
+      "metadata": {
+        "plan_id": "plan-pro",
+        "plan_name": "Professional Employer"
+      },
+      "timestamp": "2026-08-15T09:23:27.263Z"
+    },
+    {
+      "id": "aud_1786785762507_88z5",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "DELETE_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "timestamp": "2026-08-15T09:22:42.507Z"
+    },
+    {
+      "id": "aud_1786785762501_cj61",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPLOAD_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "filename": "Alpha_Updated_Resume.pdf",
+        "file_size": 107,
+        "privacy": "ELIGIBLE_EMPLOYERS"
+      },
+      "timestamp": "2026-08-15T09:22:42.501Z"
+    },
+    {
+      "id": "aud_1786785762487_c776",
+      "actor_type": "employer",
+      "actor_id": "emp_1786785762384_5066",
+      "actor_name": "Employer Account",
+      "action": "VIEW_CANDIDATE_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "res_meta_1786785762405_gkwo",
+      "metadata": {
+        "candidate_id": "cand-audit-user-A",
+        "candidate_name": "Audit Candidate Alpha",
+        "resume_filename": "Alpha_Resume.pdf",
+        "plan_id": "plan-pro",
+        "resumes_used": 1,
+        "resume_limit": 50
+      },
+      "timestamp": "2026-08-15T09:22:42.487Z"
+    },
+    {
+      "id": "aud_1786785762483_ujnh",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPDATE_RESUME_PRIVACY",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "privacy": "ELIGIBLE_EMPLOYERS"
+      },
+      "timestamp": "2026-08-15T09:22:42.483Z"
+    },
+    {
+      "id": "aud_1786785762407_jr9d",
+      "actor_type": "candidate",
+      "actor_id": "cand-audit-user-A",
+      "actor_name": "Audit Candidate Alpha",
+      "action": "UPLOAD_RESUME",
+      "target_type": "candidate_resume",
+      "target_id": "cand-audit-user-A",
+      "metadata": {
+        "filename": "Alpha_Resume.pdf",
+        "file_size": 94,
+        "privacy": "PRIVATE"
+      },
+      "timestamp": "2026-08-15T09:22:42.407Z"
+    },
+    {
+      "id": "aud_1786785762391_566d",
+      "actor_type": "employer",
+      "actor_id": "emp_1786785762384_5066",
+      "actor_name": "Employer Account",
+      "action": "SUBSCRIBE_PLAN",
+      "target_type": "subscription",
+      "target_id": "sub_1786785762390_ixqzd",
+      "metadata": {
+        "plan_id": "plan-pro",
+        "plan_name": "Professional Employer"
+      },
+      "timestamp": "2026-08-15T09:22:42.391Z"
+    },
+    {
+      "id": "aud_1786785762385_m41m",
+      "actor_type": "employer",
+      "actor_id": "emp_1786785762384_5066",
+      "actor_name": "Audit HR Lead",
+      "action": "EMPLOYER_REGISTER",
+      "target_type": "employer",
+      "target_id": "emp_1786785762384_5066",
+      "timestamp": "2026-08-15T09:22:42.385Z"
+    }
+  ],
+  "admin_users": [
+    {
+      "id": "adm_001",
+      "username": "admin",
+      "role": "super_admin",
+      "name": "Platform Administrator",
+      "password_hash": "3804beecdd45f3c9a63319089ef062776c5b966cf12d46e39265f29910d9319e",
+      "last_login": "2026-08-15T09:23:46.409Z"
+    }
+  ],
+  "system_meta": {
+    "initialized_at": "2026-08-15T09:12:40.167Z",
+    "last_persisted_at": "2026-08-15T09:23:46.409Z",
+    "total_revisions": 70
+  }
+}

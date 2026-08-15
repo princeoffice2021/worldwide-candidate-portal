@@ -1,0 +1,27 @@
+import { SkillCategory } from '../types';
+
+export const SKILL_CATEGORIES: SkillCategory[] = [
+  { id: '1', name_english: 'Driver', name_hindi: 'ड्राइवर / वाहन चालक', slug: 'driver', icon_name: 'Car', sort_order: 1 },
+  { id: '2', name_english: 'Electrician', name_hindi: 'इलेक्ट्रिशियन / बिजली मिस्त्री', slug: 'electrician', icon_name: 'Zap', sort_order: 2 },
+  { id: '3', name_english: 'Plumber', name_hindi: 'प्लंबर / नल मिस्त्री', slug: 'plumber', icon_name: 'Wrench', sort_order: 3 },
+  { id: '4', name_english: 'Teacher / Tutor', name_hindi: 'शिक्षक / ट्यूटर', slug: 'teacher', icon_name: 'GraduationCap', sort_order: 4 },
+  { id: '5', name_english: 'Computer Operator', name_hindi: 'कंप्यूटर ऑपरेटर', slug: 'computer-operator', icon_name: 'Monitor', sort_order: 5 },
+  { id: '6', name_english: 'Accountant', name_hindi: 'अकाउंटेंट / मुनीम', slug: 'accountant', icon_name: 'Calculator', sort_order: 6 },
+  { id: '7', name_english: 'Data Entry Operator', name_hindi: 'डाटा एंट्री ऑपरेटर', slug: 'data-entry', icon_name: 'FileText', sort_order: 7 },
+  { id: '8', name_english: 'Security Guard', name_hindi: 'सिक्योरिटी गार्ड / सुरक्षा गार्ड', slug: 'security-guard', icon_name: 'ShieldCheck', sort_order: 8 },
+  { id: '9', name_english: 'Delivery Worker', name_hindi: 'डिलीवरी बॉय / वर्कर', slug: 'delivery-worker', icon_name: 'Truck', sort_order: 9 },
+  { id: '10', name_english: 'Helper / Peon', name_hindi: 'हेल्पर / चपरासी', slug: 'helper', icon_name: 'UserCheck', sort_order: 10 },
+  { id: '11', name_english: 'Factory Worker', name_hindi: 'फैक्ट्री वर्कर / मजदूर', slug: 'factory-worker', icon_name: 'Factory', sort_order: 11 },
+  { id: '12', name_english: 'Machine Operator', name_hindi: 'मशीन ऑपरेटर', slug: 'machine-operator', icon_name: 'Cog', sort_order: 12 },
+  { id: '13', name_english: 'Sales Executive', name_hindi: 'सेल्य / मार्केटिंग एग्जीक्यूटिव', slug: 'sales-executive', icon_name: 'TrendingUp', sort_order: 13 },
+  { id: '14', name_english: 'Receptionist', name_hindi: 'रिसेप्शनिस्ट / फ्रंट डेस्क', slug: 'receptionist', icon_name: 'PhoneCall', sort_order: 14 },
+  { id: '15', name_english: 'Technician', name_hindi: 'तकनीशियन / मिस्त्री', slug: 'technician', icon_name: 'Hammer', sort_order: 15 },
+  { id: '16', name_english: 'Nurse / Nursing Staff', name_hindi: 'नर्स / कंपाउंडर', slug: 'nurse', icon_name: 'HeartPulse', sort_order: 16 },
+  { id: '17', name_english: 'Caregiver / Maid / Cook', name_hindi: 'केयरगिवर / रसोइया / कामवाली', slug: 'caregiver', icon_name: 'Home', sort_order: 17 },
+  { id: '18', name_english: 'Mechanic', name_hindi: 'मैकेनिक / गैरेज मिस्त्री', slug: 'mechanic', icon_name: 'Settings', sort_order: 18 },
+  { id: '19', name_english: 'Construction Worker', name_hindi: 'निर्माण मजदूर / राजमिस्त्री', slug: 'construction-worker', icon_name: 'HardHat', sort_order: 19 },
+  { id: '20', name_english: 'Skilled Worker / Craftsman', name_hindi: 'कुशल कारीगर', slug: 'skilled-worker', icon_name: 'Award', sort_order: 20 },
+  { id: '21', name_english: 'Freelance Professional', name_hindi: 'फ्रीलांसर', slug: 'freelancer', icon_name: 'Briefcase', sort_order: 21 },
+  { id: '22', name_english: 'Fresher (Any Job)', name_hindi: 'फ्रेशर (कोई भी काम)', slug: 'fresher', icon_name: 'Sparkles', sort_order: 22 },
+  { id: '23', name_english: 'Other Skilled Category', name_hindi: 'अन्य कौशल', slug: 'other', icon_name: 'MoreHorizontal', sort_order: 23 },
+];
