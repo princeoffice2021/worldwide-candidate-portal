@@ -3,6 +3,45 @@
  */
 
 export type ContentStatus = 'draft' | 'partial' | 'published';
+export type GuideStatus = ContentStatus | 'draft' | 'partial' | 'published' | 'in_review';
+
+export interface JobRoleSalaryInsights {
+  entryLevel?: string;
+  midLevel?: string;
+  seniorLevel?: string;
+  currency?: string;
+  hourlyRate?: string;
+}
+
+export interface JobRoleInterviewQuestion {
+  question: string;
+  suggestedAnswer?: string;
+  answer?: string;
+  category?: string;
+}
+
+export interface JobRoleGuide {
+  id: string;
+  roleSlug: string;
+  roleTitle: string;
+  industryId: string;
+  industryName: string;
+  departmentId: string;
+  departmentName: string;
+  status: GuideStatus;
+  metaTitle: string;
+  metaDescription: string;
+  overview: string;
+  salaryInsights?: JobRoleSalaryInsights;
+  coreSkills?: string[];
+  trendingTools?: string[];
+  certifications?: string[];
+  keyResponsibilities?: string[];
+  interviewQuestions?: JobRoleInterviewQuestion[];
+  createdAt?: string;
+  updatedAt?: string;
+  authorName?: string;
+}
 
 export interface FAQItem {
   id: string;
@@ -90,10 +129,15 @@ export interface CareerGuide {
   source_notes?: string;
 }
 
+export type AdminRole = 'super_admin' | 'admin' | 'content_editor' | 'support_admin';
+
 export interface AdminUser {
   id: string;
   username: string;
-  role: 'admin' | 'super_admin';
+  role: AdminRole;
   name: string;
+  email?: string;
   last_login?: string;
+  status?: 'active' | 'suspended';
+  created_at?: string;
 }

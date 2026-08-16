@@ -18,6 +18,10 @@ import {
   contactUnlockRepository,
   resumeAccessRepository,
   auditLogRepository,
+  platformSettingsRepository,
+  adminUserRepository,
+  taxonomyRepository,
+  masterStatsRepository,
   sanitizeCandidateForResponse,
   getCentralDb, 
   persistDbToDisk 
@@ -1537,6 +1541,483 @@ app.get('/api/admin/stats', requireAdminAuth, (req: Request, res: Response) => {
         last_persisted_at: db.system_meta.last_persisted_at
       }
     });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ===================================================
+// ADMIN MASTER CONTROL PANEL API (PHASE 8)
+// ===================================================
+
+// 1. Master Dashboard Statistics
+app.get('/api/admin/dashboard', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const stats = masterStatsRepository.getMasterStats();
+    res.json({ success: true, data: stats });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 2. Candidate Management Endpoints
+app.get('/api/admin/candidates', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { page, limit, search, status, industry_id, department_id, job_role_id, has_resume, country, sort_by } = req.query;
+    const result = candidateRepository.getAdminList({
+      page: page ? parseInt(page as string, 10) : 1,
+      limit: limit ? parseInt(limit as string, 10) : 20,
+      search: search as string,
+      status: status as string,
+      industry_id: industry_id as string,
+      department_id: department_id as string,
+      job_role_id: job_role_id as string,
+      has_resume: has_resume as string,
+      country: country as string,
+      sort_by: sort_by as string
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/admin/candidates/:id', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const result = candidateRepository.getAdminCandidateDetail(req.params.id);
+    if (!result) {
+      return res.status(404).json({ success: false, error: 'Candidate not found.' });
+    }
+    res.json({ success: true, data: result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.patch('/api/admin/candidates/:id', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { updates, reason } = req.body;
+    const result = candidateRepository.updateCandidateByAdmin(req.params.id, updates || req.body, undefined, reason);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.candidate });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/candidates/:id/status', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { status, reason } = req.body;
+    if (!['active', 'suspended', 'hidden', 'soft_deleted'].includes(status)) {
+      return res.status(400).json({ success: false, error: 'Invalid candidate status.' });
+    }
+    const result = candidateRepository.setCandidateStatusByAdmin(req.params.id, status, reason);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.candidate });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 3. Employer Management Endpoints
+app.get('/api/admin/employers', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { page, limit, search, status, plan_id, sort_by } = req.query;
+    const result = employerRepository.getAllForAdmin({
+      page: page ? parseInt(page as string, 10) : 1,
+      limit: limit ? parseInt(limit as string, 10) : 20,
+      search: search as string,
+      status: status as string,
+      plan_id: plan_id as string,
+      sort_by: sort_by as string
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/admin/employers/:id', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const result = employerRepository.getEmployerActivity(req.params.id);
+    if (!result) {
+      return res.status(404).json({ success: false, error: 'Employer not found.' });
+    }
+    res.json({ success: true, data: result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.patch('/api/admin/employers/:id', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { updates, reason } = req.body;
+    const result = employerRepository.updateEmployerByAdmin(req.params.id, updates || req.body, undefined, reason);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.employer });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/employers/:id/status', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { status, reason } = req.body;
+    if (!['active', 'suspended', 'soft_deleted'].includes(status)) {
+      return res.status(400).json({ success: false, error: 'Invalid status.' });
+    }
+    const result = employerRepository.setEmployerStatusByAdmin(req.params.id, status, reason);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.employer });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/employers/:id/subscription', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const result = employerSubscriptionRepository.adminUpdateSubscription(req.params.id, req.body);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.subscription });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/employers/:id/reset-quotas', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const result = employerSubscriptionRepository.adminResetDevQuotas(req.params.id);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.subscription, message: 'Quotas successfully reset to zero for current period.' });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 4. Subscription Plans Management
+app.get('/api/admin/plans', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const plans = subscriptionPlanRepository.getAll();
+    res.json({ success: true, data: plans });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/plans', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const result = subscriptionPlanRepository.createPlan(req.body);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.plan });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.patch('/api/admin/plans/:id', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const result = subscriptionPlanRepository.updatePlan(req.params.id, req.body);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.plan });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/plans/:id/toggle', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { is_active } = req.body;
+    const result = subscriptionPlanRepository.togglePlanStatus(req.params.id, Boolean(is_active));
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.plan });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 5. Billing & Transactions Management
+app.get('/api/admin/billing/transactions', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const db = getCentralDb();
+    const { page, limit, status, employer_id, search } = req.query;
+    let list = [...(db.payments || [])];
+
+    if (status && status !== 'all') {
+      list = list.filter(p => p.status === status);
+    }
+    if (employer_id && employer_id !== 'all') {
+      list = list.filter(p => p.employer_id === employer_id);
+    }
+    if (search && (search as string).trim()) {
+      const q = (search as string).toLowerCase().trim();
+      list = list.filter(p => 
+        p.payment_reference?.toLowerCase().includes(q) ||
+        p.id?.toLowerCase().includes(q) ||
+        p.employer_id?.toLowerCase().includes(q)
+      );
+    }
+
+    list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    const total = list.length;
+    const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
+    const limitNum = Math.min(200, Math.max(1, parseInt(limit as string, 10) || 20));
+    const paginated = list.slice((pageNum - 1) * limitNum, pageNum * limitNum);
+
+    const enriched = paginated.map(p => {
+      const emp = db.employer_profiles?.find(e => e.id === p.employer_id);
+      const plan = db.subscription_plans?.find(pl => pl.id === p.plan_id);
+      return {
+        ...p,
+        employer_name: emp?.company_name || emp?.contact_person_name || 'Employer',
+        plan_name: plan?.name || p.plan_id || 'Subscription'
+      };
+    });
+
+    res.json({ success: true, transactions: enriched, total, page: pageNum, limit: limitNum });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/admin/billing/invoices', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const db = getCentralDb();
+    const { page, limit, status, employer_id } = req.query;
+    let list = [...(db.invoices || [])];
+
+    if (status && status !== 'all') {
+      list = list.filter(i => i.status === status);
+    }
+    if (employer_id && employer_id !== 'all') {
+      list = list.filter(i => i.employer_id === employer_id);
+    }
+
+    list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    const total = list.length;
+    const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
+    const limitNum = Math.min(200, Math.max(1, parseInt(limit as string, 10) || 20));
+    const paginated = list.slice((pageNum - 1) * limitNum, pageNum * limitNum);
+
+    const enriched = paginated.map(inv => {
+      const emp = db.employer_profiles?.find(e => e.id === inv.employer_id);
+      return {
+        ...inv,
+        employer_name: emp?.company_name || emp?.contact_person_name || 'Employer'
+      };
+    });
+
+    res.json({ success: true, invoices: enriched, total, page: pageNum, limit: limitNum });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 6. Contact Unlocks & Resume Management
+app.get('/api/admin/unlocks/contacts', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { page, limit, search, employer_id, candidate_id } = req.query;
+    const result = contactUnlockRepository.getAllContactUnlocksForAdmin({
+      page: page ? parseInt(page as string, 10) : 1,
+      limit: limit ? parseInt(limit as string, 10) : 50,
+      search: search as string,
+      employer_id: employer_id as string,
+      candidate_id: candidate_id as string
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/admin/unlocks/resumes', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { page, limit, search, employer_id, candidate_id, action } = req.query;
+    const result = resumeAccessRepository.getAllResumeUnlocksForAdmin({
+      page: page ? parseInt(page as string, 10) : 1,
+      limit: limit ? parseInt(limit as string, 10) : 50,
+      search: search as string,
+      employer_id: employer_id as string,
+      candidate_id: candidate_id as string,
+      action: action as string
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/admin/resumes', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { page, limit, search, status, visibility } = req.query;
+    const result = resumeAccessRepository.getAdminResumeList({
+      page: page ? parseInt(page as string, 10) : 1,
+      limit: limit ? parseInt(limit as string, 10) : 20,
+      search: search as string,
+      status: status as string,
+      visibility: visibility as string
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/resumes/:candidateId/moderate', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { status, reason } = req.body;
+    if (!['active', 'flagged', 'archived', 'deleted'].includes(status)) {
+      return res.status(400).json({ success: false, error: 'Invalid moderation status.' });
+    }
+    const result = resumeAccessRepository.moderateResume(req.params.candidateId, status, reason);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.candidate });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 7. Audit Logs & Compliance Endpoints
+app.get('/api/admin/audit-logs', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { page, limit, actor_type, actor_id, action, target_type, target_id, from_date, to_date, search } = req.query;
+    const result = auditLogRepository.queryLogsForAdmin({
+      page: page ? parseInt(page as string, 10) : 1,
+      limit: limit ? parseInt(limit as string, 10) : 50,
+      actor_type: actor_type as string,
+      actor_id: actor_id as string,
+      action: action as string,
+      target_type: target_type as string,
+      target_id: target_id as string,
+      from_date: from_date as string,
+      to_date: to_date as string,
+      search: search as string
+    });
+    res.json({ success: true, ...result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/admin/audit-logs/export', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const db = getCentralDb();
+    const logs = db.audit_logs || [];
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename=audit-logs-${new Date().toISOString().split('T')[0]}.json`);
+    res.send(JSON.stringify(logs, null, 2));
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 8. Admin User Management
+app.get('/api/admin/users', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const users = adminUserRepository.getAll();
+    res.json({ success: true, data: users });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/users', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const result = adminUserRepository.create(req.body);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.user });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.patch('/api/admin/users/:id', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const result = adminUserRepository.update(req.params.id, req.body);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.user });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/users/:id/status', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const { status } = req.body;
+    if (!['active', 'suspended'].includes(status)) {
+      return res.status(400).json({ success: false, error: 'Invalid status.' });
+    }
+    const result = adminUserRepository.setStatus(req.params.id, status);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, data: result.user });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.delete('/api/admin/users/:id', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const result = adminUserRepository.delete(req.params.id);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, message: 'Admin user deleted successfully.' });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 9. Platform Settings & Maintenance
+app.get('/api/admin/settings', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const settings = platformSettingsRepository.getSettings();
+    res.json({ success: true, data: settings });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.put('/api/admin/settings', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const result = platformSettingsRepository.updateSettings(req.body);
+    res.json({ success: true, data: result.settings });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 10. Taxonomy & SEO Directory
+app.get('/api/admin/taxonomies', requireAdminAuth, (req: Request, res: Response) => {
+  try {
+    const tree = taxonomyRepository.getTaxonomyTree();
+    res.json({ success: true, data: tree });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }

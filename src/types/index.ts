@@ -434,6 +434,108 @@ export interface AuditLogEntry {
   timestamp: string;
 }
 
+export interface PlatformSettings {
+  platform_name: string;
+  platform_description: string;
+  default_country: string;
+  support_email: string;
+  support_phone: string;
+  candidate_registration_enabled: boolean;
+  employer_registration_enabled: boolean;
+  resume_upload_enabled: boolean;
+  contact_unlock_enabled: boolean;
+  resume_unlock_enabled: boolean;
+  public_profiles_enabled: boolean;
+  career_resources_enabled: boolean;
+  checkout_enabled: boolean;
+  min_profile_completion_for_search: number;
+  maintenance_mode_enabled: boolean;
+  maintenance_message: string;
+  updated_at?: string;
+  updated_by?: string;
+}
+
+export interface AdminMasterStats {
+  candidates: {
+    total: number;
+    active: number;
+    suspended: number;
+    hidden: number;
+    soft_deleted: number;
+    new_today: number;
+    new_week: number;
+    new_month: number;
+    completed_profiles: number;
+    incomplete_profiles: number;
+    with_resume: number;
+    without_resume: number;
+    public_profiles: number;
+    restricted_profiles: number;
+    recent_candidates: any[];
+  };
+  employers: {
+    total: number;
+    active: number;
+    suspended: number;
+    new_today: number;
+    new_month: number;
+    with_active_sub: number;
+    without_active_sub: number;
+    trial_or_dev_mode: number;
+    expired_subs: number;
+    cancelled_subs: number;
+    recent_employers: any[];
+  };
+  billing: {
+    total_revenue: number;
+    total_payments_count: number;
+    succeeded_payments_count: number;
+    failed_payments_count: number;
+    active_subscriptions_count: number;
+    monthly_subscribers: number;
+    yearly_subscribers: number;
+    expiring_soon_count: number;
+    expired_subscriptions_count: number;
+    cancelled_subscriptions_count: number;
+    total_invoices_count: number;
+    paid_invoices_count: number;
+    pending_invoices_count: number;
+    current_provider: string;
+    is_simulated_mode: boolean;
+  };
+  content: {
+    total_career_guides: number;
+    published_career_guides: number;
+    draft_career_guides: number;
+    in_review_career_guides: number;
+    total_articles: number;
+    published_articles: number;
+    draft_articles: number;
+    in_review_articles: number;
+    recently_published_count: number;
+    needing_review_count: number;
+  };
+  hierarchy: {
+    total_industries: number;
+    total_departments: number;
+    total_job_roles: number;
+    industries_with_content: number;
+    departments_with_content: number;
+    job_roles_with_guides: number;
+    job_roles_without_guides: number;
+  };
+  security: {
+    recent_audits: AuditLogEntry[];
+    recent_admin_logins: number;
+    resume_uploads_count: number;
+    resume_downloads_count: number;
+    resume_unlocks_count: number;
+    contact_unlocks_count: number;
+    failed_authorizations_count: number;
+    recent_suspensions_count: number;
+  };
+}
+
 export type VoiceLanguage = 'auto' | 'en-US' | 'hi-IN' | 'pa-IN';
 
 export interface SpeechRecognitionResult {

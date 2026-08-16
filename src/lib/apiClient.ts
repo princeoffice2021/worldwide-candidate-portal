@@ -355,47 +355,6 @@ export const api = {
     }
   },
 
-  async getAdminPlans(): Promise<any[]> {
-    try {
-      const res = await fetch('/api/admin/plans', { headers: getAuthHeaders() });
-      if (!res.ok) return [];
-      const json = await res.json();
-      return json.data || [];
-    } catch {
-      return [];
-    }
-  },
-
-  async saveAdminPlan(plan: any): Promise<{ success: boolean; plan?: any; error?: string }> {
-    try {
-      const res = await fetch('/api/admin/plans', {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(plan)
-      });
-      const json = await res.json();
-      if (!res.ok || !json.success) {
-        return { success: false, error: json.error || 'Failed to save plan' };
-      }
-      return { success: true, plan: json.data };
-    } catch (err: any) {
-      return { success: false, error: err.message || 'Network error' };
-    }
-  },
-
-  async deleteAdminPlan(planId: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      const res = await fetch(`/api/admin/plans/${encodeURIComponent(planId)}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
-      const json = await res.json();
-      return { success: json.success || res.ok, error: json.error };
-    } catch (err: any) {
-      return { success: false, error: err.message };
-    }
-  },
-
   // Employer Profile & Auth API
   async employerLoginOrRegister(data: any): Promise<{ success: boolean; employer?: any; subscription?: any; error?: string }> {
     try {
@@ -874,19 +833,6 @@ export const api = {
     }
   },
 
-  async getAdminSubscriptions(limit = 100): Promise<any[]> {
-    try {
-      const res = await fetch(`/api/admin/billing/subscriptions?limit=${limit}`, {
-        headers: getAuthHeaders()
-      });
-      if (!res.ok) return [];
-      const json = await res.json();
-      return json.data || [];
-    } catch {
-      return [];
-    }
-  },
-
   async getAdminInvoices(limit = 100): Promise<any[]> {
     try {
       const res = await fetch(`/api/admin/billing/invoices?limit=${limit}`, {
@@ -912,5 +858,677 @@ export const api = {
     } catch (err: any) {
       return { success: false, error: err.message };
     }
+  },
+
+  // ==========================================
+  // ADMIN MASTER CONTROL PANEL CLIENT APIS (PHASE 8)
+  // ==========================================
+
+  // Dashboard Stats
+  async getAdminMasterDashboard(): Promise<any | null> {
+    try {
+      const res = await fetch('/api/admin/dashboard', { headers: getAuthHeaders() });
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json.data || null;
+    } catch {
+      return null;
+    }
+  },
+
+  // Candidates
+  async getAdminCandidates(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    industry_id?: string;
+    department_id?: string;
+    job_role_id?: string;
+    has_resume?: string;
+    country?: string;
+    sort_by?: string;
+  } = {}): Promise<{ candidates: any[]; total: number; page: number; limit: number }> {
+    try {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', params.page.toString());
+      if (params.limit) sp.set('limit', params.limit.toString());
+      if (params.search) sp.set('search', params.search);
+      if (params.status) sp.set('status', params.status);
+      if (params.industry_id) sp.set('industry_id', params.industry_id);
+      if (params.department_id) sp.set('department_id', params.department_id);
+      if (params.job_role_id) sp.set('job_role_id', params.job_role_id);
+      if (params.has_resume) sp.set('has_resume', params.has_resume);
+      if (params.country) sp.set('country', params.country);
+      if (params.sort_by) sp.set('sort_by', params.sort_by);
+
+      const res = await fetch(`/api/admin/candidates?${sp.toString()}`, { headers: getAuthHeaders() });
+      if (!res.ok) return { candidates: [], total: 0, page: 1, limit: 20 };
+      const json = await res.json();
+      return {
+        candidates: json.candidates || [],
+        total: json.total || 0,
+        page: json.page || 1,
+        limit: json.limit || 20
+      };
+    } catch {
+      return { candidates: [], total: 0, page: 1, limit: 20 };
+    }
+  },
+
+  async getAdminCandidateDetail(id: string): Promise<any | null> {
+    try {
+      const res = await fetch(`/api/admin/candidates/${encodeURIComponent(id)}`, { headers: getAuthHeaders() });
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json.data || null;
+    } catch {
+      return null;
+    }
+  },
+
+  async updateAdminCandidate(id: string, updates: any, reason?: string): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/candidates/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ updates, reason })
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  async setAdminCandidateStatus(id: string, status: string, reason?: string): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/candidates/${encodeURIComponent(id)}/status`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status, reason })
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  // Employers
+  async getAdminEmployers(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    plan_id?: string;
+    sort_by?: string;
+  } = {}): Promise<{ employers: any[]; total: number; page: number; limit: number }> {
+    try {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', params.page.toString());
+      if (params.limit) sp.set('limit', params.limit.toString());
+      if (params.search) sp.set('search', params.search);
+      if (params.status) sp.set('status', params.status);
+      if (params.plan_id) sp.set('plan_id', params.plan_id);
+      if (params.sort_by) sp.set('sort_by', params.sort_by);
+
+      const res = await fetch(`/api/admin/employers?${sp.toString()}`, { headers: getAuthHeaders() });
+      if (!res.ok) return { employers: [], total: 0, page: 1, limit: 20 };
+      const json = await res.json();
+      return {
+        employers: json.employers || [],
+        total: json.total || 0,
+        page: json.page || 1,
+        limit: json.limit || 20
+      };
+    } catch {
+      return { employers: [], total: 0, page: 1, limit: 20 };
+    }
+  },
+
+  async getAdminEmployerDetail(id: string): Promise<any | null> {
+    try {
+      const res = await fetch(`/api/admin/employers/${encodeURIComponent(id)}`, { headers: getAuthHeaders() });
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json.data || null;
+    } catch {
+      return null;
+    }
+  },
+
+  async updateAdminEmployer(id: string, updates: any, reason?: string): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/employers/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ updates, reason })
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  async setAdminEmployerStatus(id: string, status: string, reason?: string): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/employers/${encodeURIComponent(id)}/status`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status, reason })
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  async updateAdminEmployerSubscription(id: string, updates: any): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/employers/${encodeURIComponent(id)}/subscription`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(updates)
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  async resetAdminEmployerQuotas(id: string): Promise<{ success: boolean; message?: string; data?: any; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/employers/${encodeURIComponent(id)}/reset-quotas`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  // Plans
+  async getAdminPlans(): Promise<any[]> {
+    try {
+      const res = await fetch('/api/admin/plans', { headers: getAuthHeaders() });
+      if (!res.ok) return [];
+      const json = await res.json();
+      return json.data || [];
+    } catch {
+      return [];
+    }
+  },
+
+  async createAdminPlan(planData: any): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch('/api/admin/plans', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(planData)
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  async updateAdminPlan(id: string, updates: any): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/plans/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(updates)
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  async toggleAdminPlanStatus(id: string, is_active: boolean): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/plans/${encodeURIComponent(id)}/toggle`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ is_active })
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  // Billing & Transactions
+  async getAdminTransactions(params: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    employer_id?: string;
+    search?: string;
+  } = {}): Promise<{ transactions: any[]; total: number; page: number; limit: number }> {
+    try {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', params.page.toString());
+      if (params.limit) sp.set('limit', params.limit.toString());
+      if (params.status) sp.set('status', params.status);
+      if (params.employer_id) sp.set('employer_id', params.employer_id);
+      if (params.search) sp.set('search', params.search);
+
+      const res = await fetch(`/api/admin/billing/transactions?${sp.toString()}`, { headers: getAuthHeaders() });
+      if (!res.ok) return { transactions: [], total: 0, page: 1, limit: 20 };
+      const json = await res.json();
+      return {
+        transactions: json.transactions || [],
+        total: json.total || 0,
+        page: json.page || 1,
+        limit: json.limit || 20
+      };
+    } catch {
+      return { transactions: [], total: 0, page: 1, limit: 20 };
+    }
+  },
+
+  async getAdminInvoicesList(params: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    employer_id?: string;
+  } = {}): Promise<{ invoices: any[]; total: number; page: number; limit: number }> {
+    try {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', params.page.toString());
+      if (params.limit) sp.set('limit', params.limit.toString());
+      if (params.status) sp.set('status', params.status);
+      if (params.employer_id) sp.set('employer_id', params.employer_id);
+
+      const res = await fetch(`/api/admin/billing/invoices?${sp.toString()}`, { headers: getAuthHeaders() });
+      if (!res.ok) return { invoices: [], total: 0, page: 1, limit: 20 };
+      const json = await res.json();
+      return {
+        invoices: json.invoices || [],
+        total: json.total || 0,
+        page: json.page || 1,
+        limit: json.limit || 20
+      };
+    } catch {
+      return { invoices: [], total: 0, page: 1, limit: 20 };
+    }
+  },
+
+  // Contact & Resume Unlocks
+  async getAdminContactUnlocks(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    employer_id?: string;
+    candidate_id?: string;
+  } = {}): Promise<{ unlocks: any[]; total: number; page: number; limit: number }> {
+    try {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', params.page.toString());
+      if (params.limit) sp.set('limit', params.limit.toString());
+      if (params.search) sp.set('search', params.search);
+      if (params.employer_id) sp.set('employer_id', params.employer_id);
+      if (params.candidate_id) sp.set('candidate_id', params.candidate_id);
+
+      const res = await fetch(`/api/admin/unlocks/contacts?${sp.toString()}`, { headers: getAuthHeaders() });
+      if (!res.ok) return { unlocks: [], total: 0, page: 1, limit: 50 };
+      const json = await res.json();
+      return {
+        unlocks: json.unlocks || [],
+        total: json.total || 0,
+        page: json.page || 1,
+        limit: json.limit || 50
+      };
+    } catch {
+      return { unlocks: [], total: 0, page: 1, limit: 50 };
+    }
+  },
+
+  async getAdminResumeUnlocks(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    employer_id?: string;
+    candidate_id?: string;
+    action?: string;
+  } = {}): Promise<{ unlocks: any[]; total: number; page: number; limit: number }> {
+    try {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', params.page.toString());
+      if (params.limit) sp.set('limit', params.limit.toString());
+      if (params.search) sp.set('search', params.search);
+      if (params.employer_id) sp.set('employer_id', params.employer_id);
+      if (params.candidate_id) sp.set('candidate_id', params.candidate_id);
+      if (params.action) sp.set('action', params.action);
+
+      const res = await fetch(`/api/admin/unlocks/resumes?${sp.toString()}`, { headers: getAuthHeaders() });
+      if (!res.ok) return { unlocks: [], total: 0, page: 1, limit: 50 };
+      const json = await res.json();
+      return {
+        unlocks: json.unlocks || [],
+        total: json.total || 0,
+        page: json.page || 1,
+        limit: json.limit || 50
+      };
+    } catch {
+      return { unlocks: [], total: 0, page: 1, limit: 50 };
+    }
+  },
+
+  // Resumes list & moderation
+  async getAdminResumes(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    visibility?: string;
+  } = {}): Promise<{ resumes: any[]; total: number; page: number; limit: number }> {
+    try {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', params.page.toString());
+      if (params.limit) sp.set('limit', params.limit.toString());
+      if (params.search) sp.set('search', params.search);
+      if (params.status) sp.set('status', params.status);
+      if (params.visibility) sp.set('visibility', params.visibility);
+
+      const res = await fetch(`/api/admin/resumes?${sp.toString()}`, { headers: getAuthHeaders() });
+      if (!res.ok) return { resumes: [], total: 0, page: 1, limit: 20 };
+      const json = await res.json();
+      return {
+        resumes: json.resumes || [],
+        total: json.total || 0,
+        page: json.page || 1,
+        limit: json.limit || 20
+      };
+    } catch {
+      return { resumes: [], total: 0, page: 1, limit: 20 };
+    }
+  },
+
+  async moderateAdminResume(candidateId: string, status: string, reason?: string): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/resumes/${encodeURIComponent(candidateId)}/moderate`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status, reason })
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  // Audit Logs
+  async getAdminAuditLogs(params: {
+    page?: number;
+    limit?: number;
+    actor_type?: string;
+    actor_id?: string;
+    action?: string;
+    target_type?: string;
+    target_id?: string;
+    from_date?: string;
+    to_date?: string;
+    search?: string;
+  } = {}): Promise<{ logs: any[]; total: number; page: number; limit: number }> {
+    try {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', params.page.toString());
+      if (params.limit) sp.set('limit', params.limit.toString());
+      if (params.actor_type) sp.set('actor_type', params.actor_type);
+      if (params.actor_id) sp.set('actor_id', params.actor_id);
+      if (params.action) sp.set('action', params.action);
+      if (params.target_type) sp.set('target_type', params.target_type);
+      if (params.target_id) sp.set('target_id', params.target_id);
+      if (params.from_date) sp.set('from_date', params.from_date);
+      if (params.to_date) sp.set('to_date', params.to_date);
+      if (params.search) sp.set('search', params.search);
+
+      const res = await fetch(`/api/admin/audit-logs?${sp.toString()}`, { headers: getAuthHeaders() });
+      if (!res.ok) return { logs: [], total: 0, page: 1, limit: 50 };
+      const json = await res.json();
+      return {
+        logs: json.logs || [],
+        total: json.total || 0,
+        page: json.page || 1,
+        limit: json.limit || 50
+      };
+    } catch {
+      return { logs: [], total: 0, page: 1, limit: 50 };
+    }
+  },
+
+  // Admin Users
+  async getAdminUsers(): Promise<any[]> {
+    try {
+      const res = await fetch('/api/admin/users', { headers: getAuthHeaders() });
+      if (!res.ok) return [];
+      const json = await res.json();
+      return json.data || [];
+    } catch {
+      return [];
+    }
+  },
+
+  async createAdminUser(data: any): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  async updateAdminUser(id: string, updates: any): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(updates)
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  async setAdminUserStatus(id: string, status: string): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(id)}/status`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status })
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  async deleteAdminUser(id: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const res = await fetch(`/api/admin/users/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  // Platform Settings
+  async getAdminSettings(): Promise<any | null> {
+    try {
+      const res = await fetch('/api/admin/settings', { headers: getAuthHeaders() });
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json.data || null;
+    } catch {
+      return null;
+    }
+  },
+
+  async updateAdminSettings(settings: any): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(settings)
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  // Taxonomy & Directory Stats
+  async getAdminTaxonomies(): Promise<any[]> {
+    try {
+      const res = await fetch('/api/admin/taxonomies', { headers: getAuthHeaders() });
+      if (!res.ok) return [];
+      const json = await res.json();
+      return json.data || [];
+    } catch {
+      return [];
+    }
+  },
+
+  // Subscriptions management
+  async getAdminSubscriptions(params?: number | { page?: number; limit?: number; search?: string; status?: string; plan?: string }): Promise<{ subscriptions: any[]; invoices: any[]; total: number; page: number; limit: number } & any[]> {
+    try {
+      const isParamObj = typeof params === 'object' && params !== null;
+      const limit = isParamObj ? (params.limit || 100) : (typeof params === 'number' ? params : 100);
+      const page = isParamObj ? (params.page || 1) : 1;
+      const search = isParamObj ? params.search : undefined;
+      const status = isParamObj ? params.status : undefined;
+      const plan = isParamObj ? params.plan : undefined;
+
+      const sp = new URLSearchParams();
+      sp.set('limit', limit.toString());
+      if (page) sp.set('page', page.toString());
+      if (search) sp.set('search', search);
+      if (status && status !== 'all') sp.set('status', status);
+      if (plan && plan !== 'all') sp.set('plan', plan);
+
+      const [subRes, invRes] = await Promise.all([
+        fetch(`/api/admin/billing/subscriptions?${sp.toString()}`, { headers: getAuthHeaders() }),
+        fetch(`/api/admin/billing/invoices?limit=100`, { headers: getAuthHeaders() })
+      ]);
+
+      const subJson = subRes.ok ? await subRes.json() : { data: [] };
+      const invJson = invRes.ok ? await invRes.json() : { invoices: [], data: [] };
+
+      const subs = subJson.data || subJson.subscriptions || [];
+      const invoices = invJson.invoices || invJson.data || [];
+
+      const result: any = subs;
+      result.subscriptions = subs;
+      result.invoices = invoices;
+      result.total = subJson.total || subs.length;
+      result.page = page;
+      result.limit = limit;
+
+      return result;
+    } catch {
+      const result: any = [];
+      result.subscriptions = [];
+      result.invoices = [];
+      result.total = 0;
+      result.page = 1;
+      result.limit = 20;
+      return result;
+    }
+  },
+
+  async updateAdminSubscription(id: string, updates: any): Promise<{ success: boolean; data?: any; error?: string }> {
+    return api.updateAdminEmployerSubscription(id, updates);
+  },
+
+  async adminAdjustEmployerQuota(id: string, updates: any): Promise<{ success: boolean; data?: any; error?: string }> {
+    return api.updateAdminEmployerSubscription(id, updates);
+  },
+
+  async deleteAdminResume(candidateId: string, reason?: string): Promise<{ success: boolean; data?: any; error?: string }> {
+    return api.moderateAdminResume(candidateId, 'deleted', reason);
+  },
+
+  async getAdminJobRoleGuides(): Promise<any[]> {
+    try {
+      return await api.getCareerGuides();
+    } catch {
+      return [];
+    }
+  },
+
+  async saveAdminJobRoleGuide(guide: any): Promise<{ success: boolean; data?: any; error?: string }> {
+    try {
+      return await api.saveAdminCareerGuide(guide);
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  },
+
+  async getAdminUnlocks(params: {
+    page?: number;
+    limit?: number;
+    type?: 'all' | 'contact' | 'resume' | string;
+    search?: string;
+  } = {}): Promise<{ unlocks: any[]; total: number; page: number; limit: number }> {
+    try {
+      const type = params.type || 'all';
+      let contactList: any[] = [];
+      let resumeList: any[] = [];
+      let total = 0;
+
+      if (type === 'all' || type === 'contact') {
+        const cRes = await api.getAdminContactUnlocks({
+          page: params.page,
+          limit: params.limit,
+          search: params.search
+        });
+        contactList = (cRes.unlocks || []).map(u => ({ ...u, type: 'contact' }));
+        total += cRes.total || contactList.length;
+      }
+
+      if (type === 'all' || type === 'resume') {
+        const rRes = await api.getAdminResumeUnlocks({
+          page: params.page,
+          limit: params.limit,
+          search: params.search
+        });
+        resumeList = (rRes.unlocks || []).map(u => ({ ...u, type: 'resume' }));
+        total += rRes.total || resumeList.length;
+      }
+
+      const combined = [...contactList, ...resumeList];
+      combined.sort((a, b) => new Date(b.created_at || b.unlocked_at || 0).getTime() - new Date(a.created_at || a.unlocked_at || 0).getTime());
+
+      return {
+        unlocks: combined,
+        total,
+        page: params.page || 1,
+        limit: params.limit || 50
+      };
+    } catch {
+      return { unlocks: [], total: 0, page: 1, limit: 50 };
+    }
+  },
+
+  // Aliases for compatibility
+  async getAdminPlatformSettings(): Promise<any | null> {
+    return api.getAdminSettings();
+  },
+
+  async updateAdminPlatformSettings(settings: any): Promise<{ success: boolean; data?: any; error?: string }> {
+    return api.updateAdminSettings(settings);
   }
 };
+
+export const apiClient = api;
+export default api;

@@ -83,6 +83,27 @@ export interface DbCareerGuide {
   updated_at: string;
 }
 
+export interface DbPlatformSettings {
+  platform_name: string;
+  platform_description: string;
+  default_country: string;
+  support_email: string;
+  support_phone: string;
+  candidate_registration_enabled: boolean;
+  employer_registration_enabled: boolean;
+  resume_upload_enabled: boolean;
+  contact_unlock_enabled: boolean;
+  resume_unlock_enabled: boolean;
+  public_profiles_enabled: boolean;
+  career_resources_enabled: boolean;
+  checkout_enabled: boolean;
+  min_profile_completion_for_search: number;
+  maintenance_mode_enabled: boolean;
+  maintenance_message: string;
+  updated_at?: string;
+  updated_by?: string;
+}
+
 export interface CentralDatabaseSchema {
   version: number;
   articles: DbArticle[];
@@ -104,9 +125,18 @@ export interface CentralDatabaseSchema {
     username: string;
     role: string;
     name: string;
+    email?: string;
+    status?: 'active' | 'suspended';
+    created_at?: string;
     password_hash: string;
     last_login?: string;
   }[];
+  platform_settings: DbPlatformSettings;
+  custom_taxonomies?: {
+    industries?: any[];
+    departments?: any[];
+    job_roles?: any[];
+  };
   system_meta: {
     initialized_at: string;
     last_persisted_at: string;
@@ -508,6 +538,26 @@ const DEFAULT_SEED_CANDIDATES = [
   }
 ];
 
+const DEFAULT_PLATFORM_SETTINGS: DbPlatformSettings = {
+  platform_name: 'Worldwide Candidate Portal',
+  platform_description: 'Global reverse job board connecting pre-screened talent across 35+ industries with worldwide employers.',
+  default_country: 'India',
+  support_email: 'support@candidateportal.com',
+  support_phone: '+1 (800) 555-0199',
+  candidate_registration_enabled: true,
+  employer_registration_enabled: true,
+  resume_upload_enabled: true,
+  contact_unlock_enabled: true,
+  resume_unlock_enabled: true,
+  public_profiles_enabled: true,
+  career_resources_enabled: true,
+  checkout_enabled: true,
+  min_profile_completion_for_search: 20,
+  maintenance_mode_enabled: false,
+  maintenance_message: 'Our platform is undergoing scheduled maintenance. Please check back shortly.',
+  updated_at: new Date().toISOString()
+};
+
 // Helper to mask phone numbers safely
 export function maskPhone(phone?: string | null): string {
   if (!phone) return 'Protected Number';
@@ -876,6 +926,18 @@ export function getCentralDb(): CentralDatabaseSchema {
         ];
         modified = true;
       }
+      if (!parsed.platform_settings) {
+        parsed.platform_settings = { ...DEFAULT_PLATFORM_SETTINGS };
+        modified = true;
+      }
+      if (!parsed.custom_taxonomies) {
+        parsed.custom_taxonomies = {
+          industries: [],
+          departments: [],
+          job_roles: []
+        };
+        modified = true;
+      }
 
       dbCache = parsed;
       if (modified) {
@@ -913,6 +975,12 @@ export function getCentralDb(): CentralDatabaseSchema {
         password_hash: '3804beecdd45f3c9a63319089ef062776c5b966cf12d46e39265f29910d9319e'
       }
     ],
+    platform_settings: { ...DEFAULT_PLATFORM_SETTINGS },
+    custom_taxonomies: {
+      industries: [],
+      departments: [],
+      job_roles: []
+    },
     system_meta: {
       initialized_at: new Date().toISOString(),
       last_persisted_at: new Date().toISOString(),
@@ -1613,6 +1681,218 @@ export const candidateRepository = {
       return found.profile_views;
     }
     return 0;
+  },
+
+  getAdminList(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    industry_id?: string;
+    department_id?: string;
+    job_role_id?: string;
+    has_resume?: string;
+    country?: string;
+    sort_by?: string;
+  } = {}): { candidates: any[]; total: number; page: number; limit: number } {
+    const db = getCentralDb();
+    let list = [...(db.candidates || [])];
+
+    // Status filter
+    if (params.status && params.status !== 'all') {
+      if (params.status === 'active') {
+        list = list.filter(c => c.is_active !== false && c.status !== 'suspended' && c.status !== 'soft_deleted');
+      } else if (params.status === 'suspended') {
+        list = list.filter(c => c.status === 'suspended');
+      } else if (params.status === 'hidden') {
+        list = list.filter(c => c.privacy_settings?.profile_visibility === 'private' || c.status === 'hidden');
+      } else if (params.status === 'soft_deleted') {
+        list = list.filter(c => c.status === 'soft_deleted');
+      }
+    }
+
+    // Taxonomy filters
+    if (params.industry_id && params.industry_id !== 'all') {
+      list = list.filter(c => c.industry_id === params.industry_id);
+    }
+    if (params.department_id && params.department_id !== 'all') {
+      list = list.filter(c => c.department_id === params.department_id);
+    }
+    if (params.job_role_id && params.job_role_id !== 'all') {
+      list = list.filter(c => c.job_role_id === params.job_role_id || c.skill_category_id === params.job_role_id);
+    }
+
+    // Country filter
+    if (params.country && params.country !== 'all') {
+      list = list.filter(c => c.country?.toLowerCase() === params.country?.toLowerCase());
+    }
+
+    // Resume filter
+    if (params.has_resume && params.has_resume !== 'all') {
+      const wantResume = params.has_resume === 'true';
+      list = list.filter(c => Boolean((c.resume && c.resume.status === 'active' && c.resume.storage_key) || c.has_resume) === wantResume);
+    }
+
+    // Search query
+    if (params.search && params.search.trim()) {
+      const q = params.search.toLowerCase().trim();
+      list = list.filter(c => {
+        const nameMatch = c.full_name?.toLowerCase().includes(q);
+        const phoneMatch = c.phone_number?.replace(/\D/g, '').includes(q.replace(/\D/g, ''));
+        const roleMatch = c.job_role_name?.toLowerCase().includes(q) || c.skill_category?.toLowerCase().includes(q);
+        const headlineMatch = c.headline?.toLowerCase().includes(q);
+        const idMatch = c.id?.toLowerCase().includes(q) || c.slug?.toLowerCase().includes(q);
+        return nameMatch || phoneMatch || roleMatch || headlineMatch || idMatch;
+      });
+    }
+
+    // Sorting
+    const sortBy = params.sort_by || 'recent';
+    list.sort((a, b) => {
+      if (sortBy === 'name') return (a.full_name || '').localeCompare(b.full_name || '');
+      if (sortBy === 'views') return (b.profile_views || 0) - (a.profile_views || 0);
+      if (sortBy === 'completion') {
+        const compA = a.completion_score || calculateProfileCompleteness(a);
+        const compB = b.completion_score || calculateProfileCompleteness(b);
+        return compB - compA;
+      }
+      return new Date(b.created_at || b.updated_at).getTime() - new Date(a.created_at || a.updated_at).getTime();
+    });
+
+    const total = list.length;
+    const page = Math.max(1, params.page || 1);
+    const limit = Math.min(200, Math.max(1, params.limit || 20));
+    const offset = (page - 1) * limit;
+    const paginated = list.slice(offset, offset + limit);
+
+    // Map enriched candidate DTO for admin
+    const enriched = paginated.map(c => {
+      const contactUnlocksCount = (db.contact_unlock_history || []).filter(u => u.candidate_id === c.id).length;
+      const resumeUnlocksCount = (db.resume_access_history || []).filter(r => r.candidate_id === c.id).length;
+      const completion = c.completion_score || calculateProfileCompleteness(c);
+      const hasResume = Boolean((c.resume && c.resume.status === 'active' && c.resume.storage_key) || c.has_resume);
+
+      return {
+        ...c,
+        completion_score: completion,
+        has_resume: hasResume,
+        contact_unlocks_count: contactUnlocksCount,
+        resume_unlocks_count: resumeUnlocksCount,
+        status: c.status || (c.is_active !== false ? 'active' : 'suspended')
+      };
+    });
+
+    return { candidates: enriched, total, page, limit };
+  },
+
+  getAdminCandidateDetail(id: string): any | null {
+    const db = getCentralDb();
+    const candidate = db.candidates?.find(c => c.id === id || c.slug === id);
+    if (!candidate) return null;
+
+    const contactUnlocks = (db.contact_unlock_history || []).filter(u => u.candidate_id === candidate.id).map(u => {
+      const employer = db.employer_profiles?.find(e => e.id === u.employer_id);
+      return {
+        ...u,
+        employer_name: employer?.company_name || employer?.contact_person_name || 'Employer Account'
+      };
+    });
+
+    const resumeUnlocks = (db.resume_access_history || []).filter(r => r.candidate_id === candidate.id).map(r => {
+      const employer = db.employer_profiles?.find(e => e.id === r.employer_id);
+      return {
+        ...r,
+        employer_name: employer?.company_name || employer?.contact_person_name || 'Employer Account'
+      };
+    });
+
+    const auditHistory = (db.audit_logs || []).filter(a => a.target_id === candidate.id || a.metadata?.candidate_id === candidate.id);
+
+    return {
+      candidate: {
+        ...candidate,
+        completion_score: calculateProfileCompleteness(candidate),
+        status: candidate.status || (candidate.is_active !== false ? 'active' : 'suspended')
+      },
+      contact_unlocks: contactUnlocks,
+      resume_unlocks: resumeUnlocks,
+      audit_history: auditHistory
+    };
+  },
+
+  updateCandidateByAdmin(id: string, updates: any, adminUser?: any, reason?: string): { success: boolean; candidate?: any; error?: string } {
+    const db = getCentralDb();
+    const candidate = db.candidates?.find(c => c.id === id);
+    if (!candidate) {
+      return { success: false, error: 'Candidate not found.' };
+    }
+
+    const now = new Date().toISOString();
+    Object.assign(candidate, updates, {
+      updated_at: now,
+      completion_score: calculateProfileCompleteness({ ...candidate, ...updates })
+    });
+
+    persistDbToDisk();
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: adminUser?.id || 'adm_001',
+      actor_name: adminUser?.name || 'Administrator',
+      action: 'ADMIN_UPDATE_CANDIDATE',
+      target_type: 'candidate',
+      target_id: candidate.id,
+      metadata: {
+        candidate_name: candidate.full_name,
+        reason: reason || 'Admin updated candidate profile',
+        updated_fields: Object.keys(updates)
+      }
+    });
+
+    return { success: true, candidate };
+  },
+
+  setCandidateStatusByAdmin(id: string, status: 'active' | 'suspended' | 'hidden' | 'soft_deleted', reason?: string, adminUser?: any): { success: boolean; candidate?: any; error?: string } {
+    const db = getCentralDb();
+    const candidate = db.candidates?.find(c => c.id === id);
+    if (!candidate) {
+      return { success: false, error: 'Candidate not found.' };
+    }
+
+    const now = new Date().toISOString();
+    candidate.status = status;
+
+    if (status === 'active') {
+      candidate.is_active = true;
+      if (candidate.privacy_settings) candidate.privacy_settings.profile_visibility = 'public';
+    } else if (status === 'suspended') {
+      candidate.is_active = false;
+    } else if (status === 'hidden') {
+      if (!candidate.privacy_settings) candidate.privacy_settings = {};
+      candidate.privacy_settings.profile_visibility = 'private';
+    } else if (status === 'soft_deleted') {
+      candidate.is_active = false;
+      candidate.deleted_at = now;
+    }
+
+    candidate.updated_at = now;
+    persistDbToDisk();
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: adminUser?.id || 'adm_001',
+      actor_name: adminUser?.name || 'Administrator',
+      action: `ADMIN_SET_CANDIDATE_STATUS_${status.toUpperCase()}`,
+      target_type: 'candidate',
+      target_id: candidate.id,
+      metadata: {
+        candidate_name: candidate.full_name,
+        new_status: status,
+        reason: reason || `Admin set status to ${status}`
+      }
+    });
+
+    return { success: true, candidate };
   }
 };
 
@@ -1650,6 +1930,104 @@ export const subscriptionPlanRepository = {
     }
 
     persistDbToDisk();
+    return { success: true, plan };
+  },
+
+  createPlan(data: any, adminUser?: any): { success: boolean; plan?: any; error?: string } {
+    const db = getCentralDb();
+    if (!db.subscription_plans) db.subscription_plans = [];
+
+    const slug = (data.slug || data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')).trim();
+    if (db.subscription_plans.some(p => p.slug === slug || p.id === data.id)) {
+      return { success: false, error: 'A subscription plan with this ID or slug already exists.' };
+    }
+
+    const now = new Date().toISOString();
+    const newPlan = {
+      id: data.id || `plan_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      code: data.code || slug.toUpperCase().replace(/-/g, '_'),
+      name: data.name.trim(),
+      slug: slug,
+      description: data.description?.trim() || '',
+      price: Number(data.price) || 0,
+      currency: data.currency || 'USD',
+      billing_interval: data.billing_interval || 'monthly',
+      contact_limit: Number(data.contact_limit) || 0,
+      contact_access_limit: Number(data.contact_limit) || 0,
+      resume_access_limit: Number(data.resume_access_limit) || 0,
+      resume_download_enabled: data.resume_download_enabled !== false,
+      phone_access_enabled: data.phone_access_enabled !== false,
+      advanced_filters_enabled: data.advanced_filters_enabled !== false,
+      features: Array.isArray(data.features) ? data.features : [],
+      is_active: data.is_active !== false,
+      is_public: data.is_public !== false,
+      sort_order: Number(data.sort_order) || db.subscription_plans.length + 1,
+      created_at: now,
+      updated_at: now
+    };
+
+    db.subscription_plans.push(newPlan);
+    persistDbToDisk();
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: adminUser?.id || 'adm_001',
+      actor_name: adminUser?.name || 'Administrator',
+      action: 'ADMIN_CREATE_PLAN',
+      target_type: 'subscription_plan',
+      target_id: newPlan.id,
+      metadata: { plan_name: newPlan.name, price: newPlan.price, interval: newPlan.billing_interval }
+    });
+
+    return { success: true, plan: newPlan };
+  },
+
+  updatePlan(id: string, updates: any, adminUser?: any): { success: boolean; plan?: any; error?: string } {
+    const db = getCentralDb();
+    const plan = db.subscription_plans?.find(p => p.id === id);
+    if (!plan) {
+      return { success: false, error: 'Subscription plan not found.' };
+    }
+
+    const now = new Date().toISOString();
+    Object.assign(plan, updates, { updated_at: now });
+    persistDbToDisk();
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: adminUser?.id || 'adm_001',
+      actor_name: adminUser?.name || 'Administrator',
+      action: 'ADMIN_UPDATE_PLAN',
+      target_type: 'subscription_plan',
+      target_id: plan.id,
+      metadata: { plan_name: plan.name, price: plan.price, is_active: plan.is_active }
+    });
+
+    return { success: true, plan };
+  },
+
+  togglePlanStatus(id: string, isActive: boolean, adminUser?: any): { success: boolean; plan?: any; error?: string } {
+    const db = getCentralDb();
+    const plan = db.subscription_plans?.find(p => p.id === id);
+    if (!plan) {
+      return { success: false, error: 'Subscription plan not found.' };
+    }
+
+    const now = new Date().toISOString();
+    plan.is_active = isActive;
+    plan.updated_at = now;
+    persistDbToDisk();
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: adminUser?.id || 'adm_001',
+      actor_name: adminUser?.name || 'Administrator',
+      action: isActive ? 'ADMIN_ACTIVATE_PLAN' : 'ADMIN_ARCHIVE_PLAN',
+      target_type: 'subscription_plan',
+      target_id: plan.id,
+      metadata: { plan_name: plan.name, is_active: isActive }
+    });
+
     return { success: true, plan };
   },
 
@@ -1707,6 +2085,187 @@ export const employerRepository = {
 
     persistDbToDisk();
     return { success: true, employer: prepared };
+  },
+
+  getAllForAdmin(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    plan_id?: string;
+    sort_by?: string;
+  } = {}): { employers: any[]; total: number; page: number; limit: number } {
+    const db = getCentralDb();
+    let list = [...(db.employer_profiles || [])];
+
+    // Status filter
+    if (params.status && params.status !== 'all') {
+      if (params.status === 'active') {
+        list = list.filter(e => e.status !== 'suspended' && e.status !== 'soft_deleted');
+      } else if (params.status === 'suspended') {
+        list = list.filter(e => e.status === 'suspended');
+      } else if (params.status === 'soft_deleted') {
+        list = list.filter(e => e.status === 'soft_deleted');
+      }
+    }
+
+    // Plan filter
+    if (params.plan_id && params.plan_id !== 'all') {
+      list = list.filter(e => {
+        const sub = db.employer_subscriptions?.find(s => s.employer_id === e.id && (s.status === 'ACTIVE' || s.status === 'active'));
+        return sub?.plan_id === params.plan_id || sub?.plan_code === params.plan_id;
+      });
+    }
+
+    // Search query
+    if (params.search && params.search.trim()) {
+      const q = params.search.toLowerCase().trim();
+      list = list.filter(e => {
+        const comp = e.company_name?.toLowerCase().includes(q);
+        const name = (e.contact_person_name || e.contact_person || e.full_name)?.toLowerCase().includes(q);
+        const email = (e.email || e.business_email)?.toLowerCase().includes(q);
+        const phone = e.phone_number?.replace(/\D/g, '').includes(q.replace(/\D/g, ''));
+        const id = e.id?.toLowerCase().includes(q);
+        return comp || name || email || phone || id;
+      });
+    }
+
+    // Sorting
+    const sortBy = params.sort_by || 'recent';
+    list.sort((a, b) => {
+      if (sortBy === 'company') return (a.company_name || '').localeCompare(b.company_name || '');
+      if (sortBy === 'name') return (a.contact_person_name || a.contact_person || '').localeCompare(b.contact_person_name || b.contact_person || '');
+      return new Date(b.created_at || b.updated_at).getTime() - new Date(a.created_at || a.updated_at).getTime();
+    });
+
+    const total = list.length;
+    const page = Math.max(1, params.page || 1);
+    const limit = Math.min(200, Math.max(1, params.limit || 20));
+    const offset = (page - 1) * limit;
+    const paginated = list.slice(offset, offset + limit);
+
+    // Enrich each employer
+    const enriched = paginated.map(e => {
+      const sub = employerSubscriptionRepository.getByEmployerId(e.id);
+      const contactUnlocksCount = (db.contact_unlock_history || []).filter(u => u.employer_id === e.id).length;
+      const resumeUnlocksCount = (db.resume_access_history || []).filter(r => r.employer_id === e.id).length;
+      const recentViewsCount = (db.recently_viewed_candidates || []).filter(r => r.employer_id === e.id).length;
+
+      return {
+        ...e,
+        subscription: sub,
+        plan_name: sub?.plan?.name || 'Free Tier',
+        plan_code: sub?.plan_code || 'FREE_MONTHLY',
+        subscription_status: sub?.status || 'ACTIVE',
+        contacts_used: sub?.contacts_used_this_period || 0,
+        contact_limit: sub?.contact_unlock_limit ?? sub?.plan?.contact_limit ?? 0,
+        resumes_used: sub?.resumes_used_this_period || 0,
+        resume_limit: sub?.resume_access_limit ?? sub?.plan?.resume_access_limit ?? 0,
+        total_contact_unlocks: contactUnlocksCount,
+        total_resume_unlocks: resumeUnlocksCount,
+        recently_viewed_count: recentViewsCount,
+        status: e.status || 'active'
+      };
+    });
+
+    return { employers: enriched, total, page, limit };
+  },
+
+  getEmployerActivity(id: string): any | null {
+    const db = getCentralDb();
+    const employer = db.employer_profiles?.find(e => e.id === id);
+    if (!employer) return null;
+
+    const sub = employerSubscriptionRepository.getByEmployerId(employer.id);
+    const contactUnlocks = (db.contact_unlock_history || []).filter(u => u.employer_id === employer.id).map(u => {
+      const candidate = db.candidates?.find(c => c.id === u.candidate_id);
+      return {
+        ...u,
+        candidate_name: candidate?.full_name || u.candidate_name_snapshot || 'Candidate'
+      };
+    });
+
+    const resumeUnlocks = (db.resume_access_history || []).filter(r => r.employer_id === employer.id).map(r => {
+      const candidate = db.candidates?.find(c => c.id === r.candidate_id);
+      return {
+        ...r,
+        candidate_name: candidate?.full_name || r.candidate_name_snapshot || 'Candidate'
+      };
+    });
+
+    const payments = (db.payments || []).filter(p => p.employer_id === employer.id);
+    const invoices = (db.invoices || []).filter(i => i.employer_id === employer.id);
+    const auditLogs = (db.audit_logs || []).filter(a => a.actor_id === employer.id || a.target_id === employer.id || a.metadata?.employer_id === employer.id);
+
+    return {
+      employer: {
+        ...employer,
+        subscription: sub,
+        status: employer.status || 'active'
+      },
+      contact_unlocks: contactUnlocks,
+      resume_unlocks: resumeUnlocks,
+      payments,
+      invoices,
+      audit_history: auditLogs
+    };
+  },
+
+  updateEmployerByAdmin(id: string, updates: any, adminUser?: any, reason?: string): { success: boolean; employer?: any; error?: string } {
+    const db = getCentralDb();
+    const employer = db.employer_profiles?.find(e => e.id === id);
+    if (!employer) {
+      return { success: false, error: 'Employer not found.' };
+    }
+
+    const now = new Date().toISOString();
+    Object.assign(employer, updates, { updated_at: now });
+    persistDbToDisk();
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: adminUser?.id || 'adm_001',
+      actor_name: adminUser?.name || 'Administrator',
+      action: 'ADMIN_UPDATE_EMPLOYER',
+      target_type: 'employer',
+      target_id: employer.id,
+      metadata: {
+        company_name: employer.company_name,
+        reason: reason || 'Admin updated employer profile',
+        updated_fields: Object.keys(updates)
+      }
+    });
+
+    return { success: true, employer };
+  },
+
+  setEmployerStatusByAdmin(id: string, status: 'active' | 'suspended' | 'soft_deleted', reason?: string, adminUser?: any): { success: boolean; employer?: any; error?: string } {
+    const db = getCentralDb();
+    const employer = db.employer_profiles?.find(e => e.id === id);
+    if (!employer) {
+      return { success: false, error: 'Employer not found.' };
+    }
+
+    const now = new Date().toISOString();
+    employer.status = status;
+    employer.updated_at = now;
+    persistDbToDisk();
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: adminUser?.id || 'adm_001',
+      actor_name: adminUser?.name || 'Administrator',
+      action: `ADMIN_SET_EMPLOYER_STATUS_${status.toUpperCase()}`,
+      target_type: 'employer',
+      target_id: employer.id,
+      metadata: {
+        company_name: employer.company_name,
+        new_status: status,
+        reason: reason || `Admin set status to ${status}`
+      }
+    });
+
+    return { success: true, employer };
   }
 };
 
@@ -1838,6 +2397,99 @@ export const employerSubscriptionRepository = {
 
     persistDbToDisk();
     return { success: true, subscription: newSub, message: `Subscribed to ${plan.name} successfully!` };
+  },
+
+  adminUpdateSubscription(employerId: string, updates: {
+    plan_id?: string;
+    status?: string;
+    extend_days?: number;
+    contact_limit_override?: number;
+    resume_limit_override?: number;
+    cancel_at_period_end?: boolean;
+    reason?: string;
+  }, adminUser?: any): { success: boolean; subscription?: any; error?: string } {
+    const db = getCentralDb();
+    let sub = this.getByEmployerId(employerId);
+    const now = new Date().toISOString();
+
+    if (updates.plan_id) {
+      const plan = db.subscription_plans?.find(p => p.id === updates.plan_id || p.code === updates.plan_id || p.slug === updates.plan_id);
+      if (plan) {
+        sub.plan_id = plan.id;
+        sub.plan_code = plan.code || 'CUSTOM';
+        sub.plan = plan;
+        sub.contact_unlock_limit = updates.contact_limit_override !== undefined ? updates.contact_limit_override : (plan.contact_limit ?? 0);
+        sub.contact_access_limit = sub.contact_unlock_limit;
+        sub.resume_access_limit = updates.resume_limit_override !== undefined ? updates.resume_limit_override : (plan.resume_access_limit ?? 0);
+      }
+    }
+
+    if (updates.status) {
+      sub.status = updates.status;
+    }
+
+    if (updates.contact_limit_override !== undefined) {
+      sub.contact_unlock_limit = Number(updates.contact_limit_override);
+      sub.contact_access_limit = sub.contact_unlock_limit;
+    }
+
+    if (updates.resume_limit_override !== undefined) {
+      sub.resume_access_limit = Number(updates.resume_limit_override);
+    }
+
+    if (updates.cancel_at_period_end !== undefined) {
+      sub.cancel_at_period_end = updates.cancel_at_period_end;
+    }
+
+    if (updates.extend_days && updates.extend_days > 0) {
+      const currentEnd = sub.current_period_end ? new Date(sub.current_period_end).getTime() : Date.now();
+      const newEnd = new Date(Math.max(Date.now(), currentEnd) + updates.extend_days * 86400000).toISOString();
+      sub.current_period_end = newEnd;
+      sub.expires_at = newEnd;
+    }
+
+    sub.updated_at = now;
+    this.save(sub);
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: adminUser?.id || 'adm_001',
+      actor_name: adminUser?.name || 'Administrator',
+      action: 'ADMIN_UPDATE_SUBSCRIPTION',
+      target_type: 'employer_subscription',
+      target_id: sub.id,
+      metadata: {
+        employer_id: employerId,
+        plan_id: sub.plan_id,
+        status: sub.status,
+        reason: updates.reason || 'Admin modified employer subscription'
+      }
+    });
+
+    return { success: true, subscription: sub };
+  },
+
+  adminResetDevQuotas(employerId: string, adminUser?: any): { success: boolean; subscription?: any; error?: string } {
+    const sub = this.getByEmployerId(employerId);
+    if (!sub) return { success: false, error: 'Subscription not found.' };
+
+    const now = new Date().toISOString();
+    sub.contacts_used_this_period = 0;
+    sub.resumes_used_this_period = 0;
+    sub.updated_at = now;
+    this.save(sub);
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: adminUser?.id || 'adm_001',
+      actor_name: adminUser?.name || 'Administrator',
+      action: 'ADMIN_RESET_QUOTAS',
+      target_type: 'employer_subscription',
+      target_id: sub.id,
+      metadata: { employer_id: employerId }
+    });
+
+    return { success: true, subscription: sub };
   }
 };
 
@@ -2194,6 +2846,56 @@ export const contactUnlockRepository = {
       candidate: candidate,
       remainingAllowance: limit - sub.contacts_used_this_period
     };
+  },
+
+  getAllContactUnlocksForAdmin(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    employer_id?: string;
+    candidate_id?: string;
+  } = {}): { unlocks: any[]; total: number; page: number; limit: number } {
+    const db = getCentralDb();
+    let list = [...(db.contact_unlock_history || [])];
+
+    if (params.employer_id && params.employer_id !== 'all') {
+      list = list.filter(u => u.employer_id === params.employer_id);
+    }
+    if (params.candidate_id && params.candidate_id !== 'all') {
+      list = list.filter(u => u.candidate_id === params.candidate_id);
+    }
+    if (params.search && params.search.trim()) {
+      const q = params.search.toLowerCase().trim();
+      list = list.filter(u => {
+        const cName = u.candidate_name_snapshot?.toLowerCase().includes(q);
+        const empId = u.employer_id?.toLowerCase().includes(q);
+        const candId = u.candidate_id?.toLowerCase().includes(q);
+        return cName || empId || candId;
+      });
+    }
+
+    list.sort((a, b) => new Date(b.unlocked_at || b.accessed_at).getTime() - new Date(a.unlocked_at || a.accessed_at).getTime());
+
+    const total = list.length;
+    const page = Math.max(1, params.page || 1);
+    const limit = Math.min(200, Math.max(1, params.limit || 50));
+    const offset = (page - 1) * limit;
+    const paginated = list.slice(offset, offset + limit);
+
+    const enriched = paginated.map(u => {
+      const employer = db.employer_profiles?.find(e => e.id === u.employer_id);
+      const candidate = db.candidates?.find(c => c.id === u.candidate_id);
+      return {
+        ...u,
+        employer_name: employer?.company_name || employer?.contact_person_name || 'Employer Account',
+        employer_phone: employer?.phone_number,
+        candidate_name: candidate?.full_name || u.candidate_name_snapshot || 'Candidate',
+        candidate_role: candidate?.job_role_name || candidate?.skill_category,
+        candidate_country: candidate?.country
+      };
+    });
+
+    return { unlocks: enriched, total, page, limit };
   }
 };
 
@@ -2219,6 +2921,162 @@ export const resumeAccessRepository = {
         candidate: candidate ? sanitizeCandidateForResponse(candidate, employerId) : null
       };
     }).sort((a, b) => new Date(b.accessed_at).getTime() - new Date(a.accessed_at).getTime());
+  },
+
+  getAdminResumeList(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    visibility?: string;
+  } = {}): { resumes: any[]; total: number; page: number; limit: number } {
+    const db = getCentralDb();
+    const candidates = db.candidates || [];
+
+    // Find all candidates with resume records
+    let list: any[] = [];
+    candidates.forEach(c => {
+      if (c.resume && c.resume.storage_key) {
+        const unlocksCount = (db.resume_access_history || []).filter(r => r.candidate_id === c.id).length;
+        list.push({
+          resume_id: c.resume.id,
+          candidate_id: c.id,
+          candidate_name: c.full_name,
+          candidate_slug: c.slug,
+          candidate_role: c.job_role_name || c.skill_category,
+          candidate_country: c.country,
+          original_filename: c.resume.original_filename,
+          file_size: c.resume.file_size,
+          content_type: c.resume.content_type,
+          uploaded_at: c.resume.uploaded_at,
+          access_visibility: c.resume.access_visibility || c.privacy_settings?.resume_visibility || 'PRIVATE',
+          status: c.resume.status || 'active',
+          is_verified: Boolean(c.resume.is_verified),
+          total_unlocks_count: unlocksCount
+        });
+      }
+    });
+
+    if (params.status && params.status !== 'all') {
+      list = list.filter(r => r.status === params.status);
+    }
+    if (params.visibility && params.visibility !== 'all') {
+      list = list.filter(r => r.access_visibility === params.visibility);
+    }
+    if (params.search && params.search.trim()) {
+      const q = params.search.toLowerCase().trim();
+      list = list.filter(r => 
+        r.candidate_name?.toLowerCase().includes(q) ||
+        r.original_filename?.toLowerCase().includes(q) ||
+        r.candidate_role?.toLowerCase().includes(q) ||
+        r.candidate_id?.toLowerCase().includes(q)
+      );
+    }
+
+    list.sort((a, b) => new Date(b.uploaded_at).getTime() - new Date(a.uploaded_at).getTime());
+
+    const total = list.length;
+    const page = Math.max(1, params.page || 1);
+    const limit = Math.min(200, Math.max(1, params.limit || 20));
+    const offset = (page - 1) * limit;
+    const paginated = list.slice(offset, offset + limit);
+
+    return { resumes: paginated, total, page, limit };
+  },
+
+  moderateResume(candidateId: string, status: 'active' | 'flagged' | 'archived' | 'deleted', reason?: string, adminUser?: any): { success: boolean; candidate?: any; error?: string } {
+    const db = getCentralDb();
+    const candidate = db.candidates?.find(c => c.id === candidateId);
+    if (!candidate || !candidate.resume) {
+      return { success: false, error: 'Candidate or candidate resume document not found.' };
+    }
+
+    const now = new Date().toISOString();
+    candidate.resume.status = status;
+    candidate.resume.moderated_at = now;
+    candidate.resume.moderated_by = adminUser?.name || 'Administrator';
+    candidate.resume.moderation_reason = reason;
+
+    if (status === 'deleted' || status === 'archived') {
+      candidate.has_resume = false;
+    } else {
+      candidate.has_resume = true;
+    }
+
+    candidate.updated_at = now;
+    persistDbToDisk();
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: adminUser?.id || 'adm_001',
+      actor_name: adminUser?.name || 'Administrator',
+      action: `ADMIN_MODERATE_RESUME_${status.toUpperCase()}`,
+      target_type: 'candidate_resume',
+      target_id: candidate.resume.id,
+      metadata: {
+        candidate_id: candidateId,
+        candidate_name: candidate.full_name,
+        new_status: status,
+        reason: reason || `Admin marked resume as ${status}`
+      }
+    });
+
+    return { success: true, candidate: sanitizeCandidateForResponse(candidate, undefined, true) };
+  },
+
+  getAllResumeUnlocksForAdmin(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    employer_id?: string;
+    candidate_id?: string;
+    action?: string;
+  } = {}): { unlocks: any[]; total: number; page: number; limit: number } {
+    const db = getCentralDb();
+    let list = [...(db.resume_access_history || [])];
+
+    if (params.employer_id && params.employer_id !== 'all') {
+      list = list.filter(r => r.employer_id === params.employer_id);
+    }
+    if (params.candidate_id && params.candidate_id !== 'all') {
+      list = list.filter(r => r.candidate_id === params.candidate_id);
+    }
+    if (params.action && params.action !== 'all') {
+      list = list.filter(r => r.action === params.action);
+    }
+    if (params.search && params.search.trim()) {
+      const q = params.search.toLowerCase().trim();
+      list = list.filter(r => {
+        const cName = r.candidate_name_snapshot?.toLowerCase().includes(q);
+        const fName = r.file_name_snapshot?.toLowerCase().includes(q);
+        const empId = r.employer_id?.toLowerCase().includes(q);
+        const candId = r.candidate_id?.toLowerCase().includes(q);
+        return cName || fName || empId || candId;
+      });
+    }
+
+    list.sort((a, b) => new Date(b.accessed_at).getTime() - new Date(a.accessed_at).getTime());
+
+    const total = list.length;
+    const page = Math.max(1, params.page || 1);
+    const limit = Math.min(200, Math.max(1, params.limit || 50));
+    const offset = (page - 1) * limit;
+    const paginated = list.slice(offset, offset + limit);
+
+    const enriched = paginated.map(r => {
+      const employer = db.employer_profiles?.find(e => e.id === r.employer_id);
+      const candidate = db.candidates?.find(c => c.id === r.candidate_id);
+      return {
+        ...r,
+        employer_name: employer?.company_name || employer?.contact_person_name || 'Employer Account',
+        employer_phone: employer?.phone_number,
+        candidate_name: candidate?.full_name || r.candidate_name_snapshot || 'Candidate',
+        candidate_role: candidate?.job_role_name || candidate?.skill_category,
+        file_name: r.file_name_snapshot || candidate?.resume?.original_filename || 'Resume.pdf'
+      };
+    });
+
+    return { unlocks: enriched, total, page, limit };
   },
 
   authorizeAndRecordAccess(
@@ -2399,6 +3257,515 @@ export const auditLogRepository = {
   getAll(limit: number = 100): any[] {
     const db = getCentralDb();
     return (db.audit_logs || []).slice(0, limit);
+  },
+
+  queryLogsForAdmin(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    actor_type?: string;
+    actor_id?: string;
+    target_type?: string;
+    target_id?: string;
+    action?: string;
+    start_date?: string;
+    end_date?: string;
+    from_date?: string;
+    to_date?: string;
+  } = {}): { logs: any[]; total: number; page: number; limit: number } {
+    const db = getCentralDb();
+    let list = [...(db.audit_logs || [])];
+
+    if (params.actor_type && params.actor_type !== 'all') {
+      list = list.filter(l => l.actor_type === params.actor_type);
+    }
+    if (params.actor_id && params.actor_id !== 'all') {
+      list = list.filter(l => l.actor_id === params.actor_id);
+    }
+    if (params.target_type && params.target_type !== 'all') {
+      list = list.filter(l => l.target_type === params.target_type);
+    }
+    if (params.target_id && params.target_id !== 'all') {
+      list = list.filter(l => l.target_id === params.target_id);
+    }
+    if (params.action && params.action !== 'all') {
+      list = list.filter(l => l.action?.toLowerCase().includes(params.action!.toLowerCase()));
+    }
+    const startDate = params.start_date || params.from_date;
+    if (startDate) {
+      const start = new Date(startDate).getTime();
+      list = list.filter(l => new Date(l.timestamp).getTime() >= start);
+    }
+    const endDate = params.end_date || params.to_date;
+    if (endDate) {
+      const end = new Date(endDate).getTime() + 86400000;
+      list = list.filter(l => new Date(l.timestamp).getTime() <= end);
+    }
+    if (params.search && params.search.trim()) {
+      const q = params.search.toLowerCase().trim();
+      list = list.filter(l => 
+        l.actor_name?.toLowerCase().includes(q) ||
+        l.action?.toLowerCase().includes(q) ||
+        l.target_type?.toLowerCase().includes(q) ||
+        l.target_id?.toLowerCase().includes(q) ||
+        JSON.stringify(l.metadata || {}).toLowerCase().includes(q)
+      );
+    }
+
+    list.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    const total = list.length;
+    const page = Math.max(1, params.page || 1);
+    const limit = Math.min(200, Math.max(1, params.limit || 50));
+    const offset = (page - 1) * limit;
+    const paginated = list.slice(offset, offset + limit);
+
+    return { logs: paginated, total, page, limit };
+  }
+};
+
+// ==========================================
+// PLATFORM SETTINGS REPOSITORY
+// ==========================================
+
+export const platformSettingsRepository = {
+  get(): DbPlatformSettings {
+    const db = getCentralDb();
+    if (!db.platform_settings) {
+      db.platform_settings = { ...DEFAULT_PLATFORM_SETTINGS };
+      persistDbToDisk();
+    }
+    return db.platform_settings;
+  },
+
+  getSettings(): DbPlatformSettings {
+    return this.get();
+  },
+
+  update(updates: Partial<DbPlatformSettings>, adminUser?: any): { success: boolean; settings: DbPlatformSettings } {
+    const db = getCentralDb();
+    const current = db.platform_settings || { ...DEFAULT_PLATFORM_SETTINGS };
+    const now = new Date().toISOString();
+
+    const previousMaintenance = current.maintenance_mode_enabled;
+    const newMaintenance = updates.maintenance_mode_enabled !== undefined ? updates.maintenance_mode_enabled : previousMaintenance;
+
+    const merged: DbPlatformSettings = {
+      ...current,
+      ...updates,
+      updated_at: now,
+      updated_by: adminUser?.name || adminUser?.username || 'Administrator'
+    };
+
+    db.platform_settings = merged;
+    persistDbToDisk();
+
+    // Record audit event
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: adminUser?.id || 'adm_001',
+      actor_name: adminUser?.name || 'Administrator',
+      action: previousMaintenance !== newMaintenance 
+        ? (newMaintenance ? 'MAINTENANCE_MODE_ENABLED' : 'MAINTENANCE_MODE_DISABLED') 
+        : 'UPDATE_PLATFORM_SETTINGS',
+      target_type: 'platform_settings',
+      target_id: 'global',
+      metadata: {
+        maintenance_mode: merged.maintenance_mode_enabled,
+        candidate_reg: merged.candidate_registration_enabled,
+        employer_reg: merged.employer_registration_enabled,
+        resume_upload: merged.resume_upload_enabled
+      }
+    });
+
+    return { success: true, settings: merged };
+  },
+
+  updateSettings(updates: Partial<DbPlatformSettings>, adminUser?: any): { success: boolean; settings: DbPlatformSettings } {
+    return this.update(updates, adminUser);
+  }
+};
+
+// ==========================================
+// ADMIN USER REPOSITORY
+// ==========================================
+
+export const adminUserRepository = {
+  getAll(): any[] {
+    const db = getCentralDb();
+    return (db.admin_users || []).map(u => ({
+      id: u.id,
+      username: u.username,
+      role: u.role || 'admin',
+      name: u.name,
+      email: u.email || `${u.username}@candidateportal.com`,
+      status: u.status || 'active',
+      created_at: u.created_at || db.system_meta.initialized_at,
+      last_login: u.last_login
+    }));
+  },
+
+  getById(id: string): any | null {
+    const db = getCentralDb();
+    const user = db.admin_users?.find(u => u.id === id || u.username === id);
+    if (!user) return null;
+    return {
+      id: user.id,
+      username: user.username,
+      role: user.role || 'admin',
+      name: user.name,
+      email: user.email,
+      status: user.status || 'active',
+      created_at: user.created_at,
+      last_login: user.last_login
+    };
+  },
+
+  create(data: { username: string; name: string; role: string; password_hash: string; email?: string }, actorAdmin?: any): { success: boolean; user?: any; error?: string } {
+    const db = getCentralDb();
+    if (!db.admin_users) db.admin_users = [];
+
+    const cleanUsername = data.username.toLowerCase().trim();
+    if (db.admin_users.some(u => u.username.toLowerCase() === cleanUsername)) {
+      return { success: false, error: 'An administrator with this username already exists.' };
+    }
+
+    const now = new Date().toISOString();
+    const newUser = {
+      id: `adm_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      username: cleanUsername,
+      name: data.name.trim(),
+      role: data.role || 'admin',
+      email: data.email?.trim() || `${cleanUsername}@candidateportal.com`,
+      status: 'active' as const,
+      password_hash: data.password_hash,
+      created_at: now
+    };
+
+    db.admin_users.push(newUser);
+    persistDbToDisk();
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: actorAdmin?.id || 'adm_001',
+      actor_name: actorAdmin?.name || 'Super Administrator',
+      action: 'CREATE_ADMIN_USER',
+      target_type: 'admin_user',
+      target_id: newUser.id,
+      metadata: { username: newUser.username, role: newUser.role }
+    });
+
+    return {
+      success: true,
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        role: newUser.role,
+        name: newUser.name,
+        email: newUser.email,
+        status: newUser.status,
+        created_at: newUser.created_at
+      }
+    };
+  },
+
+  update(id: string, updates: { name?: string; role?: string; email?: string; status?: 'active' | 'suspended'; password_hash?: string }, actorAdmin?: any): { success: boolean; user?: any; error?: string } {
+    const db = getCentralDb();
+    const user = db.admin_users?.find(u => u.id === id);
+    if (!user) {
+      return { success: false, error: 'Administrator user not found.' };
+    }
+
+    if (updates.name) user.name = updates.name.trim();
+    if (updates.role) user.role = updates.role;
+    if (updates.email) user.email = updates.email.trim();
+    if (updates.status) user.status = updates.status;
+    if (updates.password_hash) user.password_hash = updates.password_hash;
+
+    persistDbToDisk();
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: actorAdmin?.id || 'adm_001',
+      actor_name: actorAdmin?.name || 'Administrator',
+      action: 'UPDATE_ADMIN_USER',
+      target_type: 'admin_user',
+      target_id: user.id,
+      metadata: { username: user.username, role: user.role, status: user.status }
+    });
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        name: user.name,
+        email: user.email,
+        status: user.status,
+        created_at: user.created_at,
+        last_login: user.last_login
+      }
+    };
+  },
+
+  setStatus(id: string, status: 'active' | 'suspended', actorAdmin?: any): { success: boolean; user?: any; error?: string } {
+    return this.update(id, { status }, actorAdmin);
+  },
+
+  delete(id: string, actorAdmin?: any): { success: boolean; error?: string } {
+    const db = getCentralDb();
+    if (id === 'adm_001') {
+      return { success: false, error: 'Cannot delete the primary root system administrator.' };
+    }
+
+    const index = db.admin_users?.findIndex(u => u.id === id);
+    if (index === undefined || index === -1) {
+      return { success: false, error: 'Administrator user not found.' };
+    }
+
+    const deleted = db.admin_users.splice(index, 1)[0];
+    persistDbToDisk();
+
+    auditLogRepository.record({
+      actor_type: 'admin',
+      actor_id: actorAdmin?.id || 'adm_001',
+      actor_name: actorAdmin?.name || 'Administrator',
+      action: 'DELETE_ADMIN_USER',
+      target_type: 'admin_user',
+      target_id: deleted.id,
+      metadata: { username: deleted.username, role: deleted.role }
+    });
+
+    return { success: true };
+  }
+};
+
+// ==========================================
+// TAXONOMY & HIERARCHY REPOSITORY
+// ==========================================
+
+export const taxonomyRepository = {
+  getStats(): any {
+    const db = getCentralDb();
+    const guides = db.career_guides || [];
+    const articles = db.articles || [];
+
+    const totalIndustries = 35;
+    const totalDepartments = 120;
+    const totalJobRoles = 1050;
+
+    const publishedGuides = guides.filter(g => g.content_status === 'published').length;
+    const draftGuides = guides.filter(g => (g.content_status as string) === 'draft' || (g.content_status as string) === 'partial').length;
+    const publishedArticles = articles.filter(a => a.status === 'published').length;
+
+    const roleIdsWithGuides = new Set(guides.filter(g => g.content_status === 'published').map(g => g.job_role_id));
+    const industriesWithGuides = new Set(guides.map(g => g.industry_id));
+    const departmentsWithGuides = new Set(guides.map(g => g.department_id));
+
+    return {
+      total_industries: totalIndustries,
+      total_departments: totalDepartments,
+      total_job_roles: totalJobRoles,
+      published_career_guides: publishedGuides,
+      draft_career_guides: draftGuides,
+      published_articles: publishedArticles,
+      job_roles_with_guides: roleIdsWithGuides.size,
+      job_roles_without_guides: Math.max(0, totalJobRoles - roleIdsWithGuides.size),
+      industries_with_content: industriesWithGuides.size,
+      departments_with_content: departmentsWithGuides.size,
+      seo_coverage_percentage: Math.min(100, Math.round(((roleIdsWithGuides.size + publishedArticles) / (totalJobRoles + 50)) * 100))
+    };
+  },
+
+  getTaxonomyTree(): any {
+    return this.getStats();
+  }
+};
+
+// ==========================================
+// MASTER ADMIN STATISTICS REPOSITORY
+// ==========================================
+
+export const masterStatsRepository = {
+  getMasterStats(): any {
+    const db = getCentralDb();
+    const candidates = db.candidates || [];
+    const employers = db.employer_profiles || [];
+    const subscriptions = db.employer_subscriptions || [];
+    const payments = db.payments || [];
+    const invoices = db.invoices || [];
+    const articles = db.articles || [];
+    const guides = db.career_guides || [];
+    const audits = db.audit_logs || [];
+    const resumeAccess = db.resume_access_history || [];
+    const contactUnlocks = db.contact_unlock_history || [];
+
+    const now = Date.now();
+    const oneDayAgo = now - 86400000;
+    const oneWeekAgo = now - 86400000 * 7;
+    const oneMonthAgo = now - 86400000 * 30;
+
+    // Candidates breakdown
+    const activeCandidates = candidates.filter(c => c.is_active !== false && c.status !== 'suspended' && c.status !== 'soft_deleted');
+    const suspendedCandidates = candidates.filter(c => c.status === 'suspended');
+    const softDeletedCandidates = candidates.filter(c => c.status === 'soft_deleted');
+    const hiddenCandidates = candidates.filter(c => c.privacy_settings?.profile_visibility === 'private' || c.status === 'hidden');
+
+    const newCandidatesToday = candidates.filter(c => new Date(c.created_at).getTime() >= oneDayAgo).length;
+    const newCandidatesWeek = candidates.filter(c => new Date(c.created_at).getTime() >= oneWeekAgo).length;
+    const newCandidatesMonth = candidates.filter(c => new Date(c.created_at).getTime() >= oneMonthAgo).length;
+
+    const completedCandidates = candidates.filter(c => (c.completion_score || calculateProfileCompleteness(c)) >= 80).length;
+    const incompleteCandidates = candidates.length - completedCandidates;
+
+    const withResume = candidates.filter(c => Boolean((c.resume && c.resume.status === 'active' && c.resume.storage_key) || c.has_resume)).length;
+    const withoutResume = candidates.length - withResume;
+
+    const publicProfiles = candidates.filter(c => c.privacy_settings?.profile_visibility !== 'private').length;
+    const restrictedProfiles = candidates.length - publicProfiles;
+
+    // Employers breakdown
+    const activeEmployers = employers.filter(e => e.status !== 'suspended' && e.status !== 'soft_deleted');
+    const suspendedEmployers = employers.filter(e => e.status === 'suspended');
+    const newEmployersToday = employers.filter(e => new Date(e.created_at).getTime() >= oneDayAgo).length;
+    const newEmployersMonth = employers.filter(e => new Date(e.created_at).getTime() >= oneMonthAgo).length;
+
+    const activeSubs = subscriptions.filter(s => s.status === 'ACTIVE' || s.status === 'active');
+    const expiredSubs = subscriptions.filter(s => s.status === 'EXPIRED');
+    const cancelledSubs = subscriptions.filter(s => s.status === 'CANCELLED');
+
+    const employersWithActiveSub = new Set(activeSubs.map(s => s.employer_id)).size;
+    const employersWithoutActiveSub = Math.max(0, employers.length - employersWithActiveSub);
+
+    // Billing breakdown
+    const succeededPayments = payments.filter(p => p.status === 'SUCCEEDED');
+    const failedPayments = payments.filter(p => p.status === 'FAILED');
+    const totalRevenue = succeededPayments.reduce((sum, p) => sum + (Number(p.total_amount) || 0), 0);
+
+    const monthlySubscribers = activeSubs.filter(s => (s.plan?.billing_interval || 'monthly') === 'monthly').length;
+    const yearlySubscribers = activeSubs.filter(s => (s.plan?.billing_interval || '') === 'yearly').length;
+
+    const expiringSoon = activeSubs.filter(s => {
+      if (!s.current_period_end) return false;
+      const end = new Date(s.current_period_end).getTime();
+      return end > now && end < (now + 86400000 * 7);
+    }).length;
+
+    const paidInvoices = invoices.filter(i => i.status === 'PAID').length;
+    const pendingInvoices = invoices.filter(i => i.status === 'PENDING').length;
+
+    // Content breakdown
+    const publishedArticles = articles.filter(a => a.status === 'published').length;
+    const draftArticles = articles.filter(a => a.status === 'draft').length;
+    const inReviewArticles = articles.filter(a => a.status === 'in_review').length;
+
+    const publishedGuides = guides.filter(g => g.content_status === 'published').length;
+    const draftGuides = guides.filter(g => (g.content_status as string) === 'draft' || (g.content_status as string) === 'partial').length;
+
+    // Security metrics
+    const adminLogins = audits.filter(a => a.action === 'ADMIN_LOGIN' && new Date(a.timestamp).getTime() >= oneMonthAgo).length;
+    const resumeUploads = audits.filter(a => a.action === 'UPLOAD_RESUME').length;
+    const resumeDownloads = audits.filter(a => a.action === 'DOWNLOAD_CANDIDATE_RESUME').length;
+    const suspensionsCount = audits.filter(a => a.action?.includes('SUSPEND')).length;
+
+    return {
+      candidates: {
+        total: candidates.length,
+        active: activeCandidates.length,
+        suspended: suspendedCandidates.length,
+        hidden: hiddenCandidates.length,
+        soft_deleted: softDeletedCandidates.length,
+        new_today: newCandidatesToday,
+        new_week: newCandidatesWeek,
+        new_month: newCandidatesMonth,
+        completed_profiles: completedCandidates,
+        incomplete_profiles: incompleteCandidates,
+        with_resume: withResume,
+        without_resume: withoutResume,
+        public_profiles: publicProfiles,
+        restricted_profiles: restrictedProfiles,
+        recent_candidates: candidates.slice(0, 8).map(c => ({
+          id: c.id,
+          full_name: c.full_name,
+          phone_number: c.phone_number,
+          job_role_name: c.job_role_name || c.skill_category,
+          country: c.country,
+          has_resume: Boolean((c.resume && c.resume.status === 'active' && c.resume.storage_key) || c.has_resume),
+          created_at: c.created_at,
+          status: c.status || (c.is_active !== false ? 'active' : 'inactive')
+        }))
+      },
+      employers: {
+        total: employers.length,
+        active: activeEmployers.length,
+        suspended: suspendedEmployers.length,
+        new_today: newEmployersToday,
+        new_month: newEmployersMonth,
+        with_active_sub: employersWithActiveSub,
+        without_active_sub: employersWithoutActiveSub,
+        trial_or_dev_mode: activeSubs.filter(s => s.is_trial || (s.plan && s.plan.price === 0)).length,
+        expired_subs: expiredSubs.length,
+        cancelled_subs: cancelledSubs.length,
+        recent_employers: employers.slice(0, 8).map(e => ({
+          id: e.id,
+          company_name: e.company_name,
+          contact_person: e.contact_person,
+          phone_number: e.phone_number,
+          country: e.country,
+          created_at: e.created_at,
+          status: e.status || 'active'
+        }))
+      },
+      billing: {
+        total_revenue: totalRevenue,
+        total_payments_count: payments.length,
+        succeeded_payments_count: succeededPayments.length,
+        failed_payments_count: failedPayments.length,
+        active_subscriptions_count: activeSubs.length,
+        monthly_subscribers: monthlySubscribers,
+        yearly_subscribers: yearlySubscribers,
+        expiring_soon_count: expiringSoon,
+        expired_subscriptions_count: expiredSubs.length,
+        cancelled_subscriptions_count: cancelledSubs.length,
+        total_invoices_count: invoices.length,
+        paid_invoices_count: paidInvoices,
+        pending_invoices_count: pendingInvoices,
+        current_provider: process.env.PAYMENT_PROVIDER || 'development',
+        is_simulated_mode: (process.env.PAYMENT_PROVIDER || 'development') === 'development'
+      },
+      content: {
+        total_career_guides: guides.length,
+        published_career_guides: publishedGuides,
+        draft_career_guides: draftGuides,
+        in_review_career_guides: guides.filter(g => (g.content_status as string) === 'partial').length,
+        total_articles: articles.length,
+        published_articles: publishedArticles,
+        draft_articles: draftArticles,
+        in_review_articles: inReviewArticles,
+        recently_published_count: publishedArticles + publishedGuides,
+        needing_review_count: inReviewArticles + draftGuides
+      },
+      hierarchy: {
+        total_industries: 35,
+        total_departments: 120,
+        total_job_roles: 1050,
+        industries_with_content: new Set(guides.map(g => g.industry_id)).size,
+        departments_with_content: new Set(guides.map(g => g.department_id)).size,
+        job_roles_with_guides: new Set(guides.filter(g => g.content_status === 'published').map(g => g.job_role_id)).size,
+        job_roles_without_guides: Math.max(0, 1050 - new Set(guides.filter(g => g.content_status === 'published').map(g => g.job_role_id)).size)
+      },
+      security: {
+        recent_audits: audits.slice(0, 10),
+        recent_admin_logins: adminLogins,
+        resume_uploads_count: resumeUploads,
+        resume_downloads_count: resumeDownloads,
+        resume_unlocks_count: resumeAccess.length,
+        contact_unlocks_count: contactUnlocks.length,
+        failed_authorizations_count: audits.filter(a => a.action?.includes('DENIED') || a.action?.includes('FAILED')).length,
+        recent_suspensions_count: suspensionsCount
+      }
+    };
   }
 };
 
