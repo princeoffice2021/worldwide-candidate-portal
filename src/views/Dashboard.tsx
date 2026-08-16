@@ -27,7 +27,21 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
-  const { user, candidate, toggleAvailability, logout } = useAuth();
+  const { user, candidate, loading, toggleAvailability, logout } = useAuth();
+
+  React.useEffect(() => {
+    if (!loading && !user) {
+      onNavigate('landing');
+    }
+  }, [loading, user, onNavigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!candidate) {
     return (
@@ -98,7 +112,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               <span>Edit Full Profile</span>
             </button>
             <button
-              onClick={logout}
+              onClick={async () => {
+                await logout();
+                onNavigate('landing');
+              }}
               className="bg-slate-800 hover:bg-red-600 text-white font-bold text-xs p-2 rounded-xl transition border border-slate-700 cursor-pointer"
               title="Logout Session"
             >

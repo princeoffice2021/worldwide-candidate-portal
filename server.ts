@@ -372,6 +372,19 @@ app.get('/api/candidates/:slug', (req: Request, res: Response) => {
   }
 });
 
+  app.get('/api/candidates/user/:userId', (req: Request, res: Response) => {
+    try {
+      const { userId } = req.params;
+      const candidate = candidateRepository.getByUserId(userId, false) || candidateRepository.getRawById(userId);
+      if (!candidate) {
+        return res.status(404).json({ success: false, error: 'Candidate profile not found for user ID.' });
+      }
+      res.json({ success: true, data: candidate });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
   app.post('/api/candidates', (req: Request, res: Response) => {
     try {
       const candidateData = req.body;

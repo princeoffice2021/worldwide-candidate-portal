@@ -92,7 +92,10 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
                     </span>
                   </button>
                   <button
-                    onClick={employerLogout}
+                    onClick={() => {
+                      employerLogout();
+                      onNavigate('landing');
+                    }}
                     className="text-slate-400 hover:text-red-400 p-1 rounded transition cursor-pointer"
                     title="Employer Logout"
                   >
@@ -131,7 +134,10 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
                   </button>
 
                   <button
-                    onClick={logout}
+                    onClick={async () => {
+                      await logout();
+                      onNavigate('landing');
+                    }}
                     className="p-2 rounded-xl bg-slate-800 hover:bg-red-600/90 text-slate-300 hover:text-white transition border border-slate-700 cursor-pointer"
                     title="Candidate Logout"
                   >
@@ -166,12 +172,23 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
               📚 Guides
             </button>
             {employer ? (
-              <button
-                onClick={() => onNavigate('employer-dashboard')}
-                className="hover:underline text-blue-300 font-bold"
-              >
-                🏢 Employer Desk
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => onNavigate('employer-dashboard')}
+                  className="hover:underline text-blue-300 font-bold"
+                >
+                  🏢 {employer.company_name.split(' ')[0]}
+                </button>
+                <button
+                  onClick={() => {
+                    employerLogout();
+                    onNavigate('landing');
+                  }}
+                  className="text-red-400 hover:text-red-300 font-medium"
+                >
+                  Sign Out
+                </button>
+              </div>
             ) : (
               <button
                 onClick={() => setShowEmployerAuthModal(true)}

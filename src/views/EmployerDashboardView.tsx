@@ -245,7 +245,10 @@ export const EmployerDashboardView: React.FC<EmployerDashboardViewProps> = ({ on
                 <span>Manage Subscription</span>
               </button>
               <button
-                onClick={employerLogout}
+                onClick={() => {
+                  employerLogout();
+                  onNavigate('landing');
+                }}
                 className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3.5 py-2.5 rounded-xl transition cursor-pointer"
               >
                 Sign Out

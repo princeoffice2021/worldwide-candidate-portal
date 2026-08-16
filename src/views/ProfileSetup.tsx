@@ -38,7 +38,13 @@ interface ProfileSetupProps {
 }
 
 export const ProfileSetup: React.FC<ProfileSetupProps> = ({ onNavigate }) => {
-  const { user, candidate, saveProfile } = useAuth();
+  const { user, candidate, loading: authLoading, saveProfile } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      onNavigate('landing');
+    }
+  }, [authLoading, user, onNavigate]);
 
   // Active Tab for intuitive progressive disclosure
   const [activeTab, setActiveTab] = useState<'essential' | 'experience' | 'skills_education' | 'preferences_privacy'>('essential');

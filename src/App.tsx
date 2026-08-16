@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { LandingPage } from './views/LandingPage';
@@ -45,7 +45,8 @@ const RouteLoadingSpinner = () => (
   </div>
 );
 
-export default function App() {
+function AppContent() {
+  const { user, employer, loading: authLoading } = useAuth();
   const [currentView, setCurrentView] = useState<string>('landing');
   const [selectedSlug, setSelectedSlug] = useState<string>('');
   const [selectedDepartmentSlug, setSelectedDepartmentSlug] = useState<string>('');
@@ -245,80 +246,86 @@ export default function App() {
   const isAdminView = currentView === 'admin-dashboard' || currentView === 'admin-login';
 
   return (
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white">
+      
+      {/* Navigation Header (hidden inside admin dashboard for immersion) */}
+      {!isAdminView && <Header currentView={currentView} onNavigate={handleNavigate} />}
+
+      {/* Main View Router wrapped with Suspense */}
+      <main className="flex-1">
+        <Suspense fallback={<RouteLoadingSpinner />}>
+          {currentView === 'landing' && <LandingPage onNavigate={handleNavigate} />}
+          {currentView === 'login' && <PhoneLogin onNavigate={handleNavigate} />}
+          {currentView === 'profile-setup' && <ProfileSetup onNavigate={handleNavigate} />}
+          {currentView === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
+          {currentView === 'profile-edit' && <ProfileEdit onNavigate={handleNavigate} />}
+          {currentView === 'find-candidates' && (
+            <FindCandidatesView onNavigate={handleNavigate} initialFilters={categoryFilters} />
+          )}
+          {currentView === 'employer-dashboard' && (
+            <EmployerDashboardView onNavigate={handleNavigate} />
+          )}
+          {currentView === 'subscription-plans' && <SubscriptionPlansView onNavigate={handleNavigate} />}
+          {currentView === 'checkout' && <CheckoutView planId={selectedSlug} onNavigate={handleNavigate} />}
+          {currentView === 'invoice' && <InvoiceView invoiceId={selectedSlug} onNavigate={handleNavigate} />}
+          {currentView === 'public-profile' && (
+            <PublicProfileView slug={selectedSlug} onNavigate={handleNavigate} />
+          )}
+          
+          {/* SEO Career Content Engine Views */}
+          {currentView === 'industries' && (
+            <IndustriesDirectoryView onNavigate={handleNavigate} />
+          )}
+          {currentView === 'industry-detail' && (
+            <IndustryDetailView industrySlug={selectedSlug} onNavigate={handleNavigate} />
+          )}
+          {currentView === 'department-detail' && (
+            <DepartmentDetailView 
+              industrySlug={selectedSlug} 
+              departmentSlug={selectedDepartmentSlug} 
+              onNavigate={handleNavigate} 
+            />
+          )}
+          {currentView === 'career-detail' && (
+            <CareerDetailView roleSlug={selectedSlug} onNavigate={handleNavigate} />
+          )}
+          {currentView === 'sitemap' && (
+            <SitemapView onNavigate={handleNavigate} />
+          )}
+
+          {/* Admin CMS Views */}
+          {currentView === 'admin-login' && (
+            <AdminLoginView onNavigate={handleNavigate} />
+          )}
+          {currentView === 'admin-dashboard' && (
+            <AdminDashboardView onNavigate={handleNavigate} />
+          )}
+
+          {/* Canonical Career Resources & Article Views */}
+          {(currentView === 'career-resources' || currentView === 'resources' || currentView === 'blog') && (
+            <BlogHomeView onNavigate={handleNavigate} />
+          )}
+          {currentView === 'article-detail' && (
+            <ArticleDetailView slug={selectedSlug} onNavigate={handleNavigate} />
+          )}
+          {currentView === 'about' && <AboutUsView onNavigate={handleNavigate} />}
+          {currentView === 'privacy' && <PrivacyPolicyView onNavigate={handleNavigate} />}
+          {currentView === 'terms' && <TermsOfUseView onNavigate={handleNavigate} />}
+          {currentView === 'contact' && <ContactUsView onNavigate={handleNavigate} />}
+        </Suspense>
+      </main>
+
+      {/* Global Footer (hidden on admin dashboard) */}
+      {!isAdminView && <Footer onNavigate={handleNavigate} />}
+
+    </div>
+  );
+}
+
+export default function App() {
+  return (
     <AuthProvider>
-      <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white">
-        
-        {/* Navigation Header (hidden inside admin dashboard for immersion) */}
-        {!isAdminView && <Header currentView={currentView} onNavigate={handleNavigate} />}
-
-        {/* Main View Router wrapped with Suspense */}
-        <main className="flex-1">
-          <Suspense fallback={<RouteLoadingSpinner />}>
-            {currentView === 'landing' && <LandingPage onNavigate={handleNavigate} />}
-            {currentView === 'login' && <PhoneLogin onNavigate={handleNavigate} />}
-            {currentView === 'profile-setup' && <ProfileSetup onNavigate={handleNavigate} />}
-            {currentView === 'dashboard' && <Dashboard onNavigate={handleNavigate} />}
-            {currentView === 'profile-edit' && <ProfileEdit onNavigate={handleNavigate} />}
-            {currentView === 'find-candidates' && (
-              <FindCandidatesView onNavigate={handleNavigate} initialFilters={categoryFilters} />
-            )}
-            {currentView === 'employer-dashboard' && (
-              <EmployerDashboardView onNavigate={handleNavigate} />
-            )}
-            {currentView === 'subscription-plans' && <SubscriptionPlansView onNavigate={handleNavigate} />}
-            {currentView === 'checkout' && <CheckoutView planId={selectedSlug} onNavigate={handleNavigate} />}
-            {currentView === 'invoice' && <InvoiceView invoiceId={selectedSlug} onNavigate={handleNavigate} />}
-            {currentView === 'public-profile' && (
-              <PublicProfileView slug={selectedSlug} onNavigate={handleNavigate} />
-            )}
-            
-            {/* SEO Career Content Engine Views */}
-            {currentView === 'industries' && (
-              <IndustriesDirectoryView onNavigate={handleNavigate} />
-            )}
-            {currentView === 'industry-detail' && (
-              <IndustryDetailView industrySlug={selectedSlug} onNavigate={handleNavigate} />
-            )}
-            {currentView === 'department-detail' && (
-              <DepartmentDetailView 
-                industrySlug={selectedSlug} 
-                departmentSlug={selectedDepartmentSlug} 
-                onNavigate={handleNavigate} 
-              />
-            )}
-            {currentView === 'career-detail' && (
-              <CareerDetailView roleSlug={selectedSlug} onNavigate={handleNavigate} />
-            )}
-            {currentView === 'sitemap' && (
-              <SitemapView onNavigate={handleNavigate} />
-            )}
-
-            {/* Admin CMS Views */}
-            {currentView === 'admin-login' && (
-              <AdminLoginView onNavigate={handleNavigate} />
-            )}
-            {currentView === 'admin-dashboard' && (
-              <AdminDashboardView onNavigate={handleNavigate} />
-            )}
-
-            {/* Canonical Career Resources & Article Views */}
-            {(currentView === 'career-resources' || currentView === 'resources' || currentView === 'blog') && (
-              <BlogHomeView onNavigate={handleNavigate} />
-            )}
-            {currentView === 'article-detail' && (
-              <ArticleDetailView slug={selectedSlug} onNavigate={handleNavigate} />
-            )}
-            {currentView === 'about' && <AboutUsView onNavigate={handleNavigate} />}
-            {currentView === 'privacy' && <PrivacyPolicyView onNavigate={handleNavigate} />}
-            {currentView === 'terms' && <TermsOfUseView onNavigate={handleNavigate} />}
-            {currentView === 'contact' && <ContactUsView onNavigate={handleNavigate} />}
-          </Suspense>
-        </main>
-
-        {/* Global Footer (hidden on admin dashboard) */}
-        {!isAdminView && <Footer onNavigate={handleNavigate} />}
-
-      </div>
+      <AppContent />
     </AuthProvider>
   );
 }

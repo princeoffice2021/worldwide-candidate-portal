@@ -37,7 +37,7 @@ interface AuthContextType {
   
   saveProfile: (data: Partial<Candidate>) => Promise<{ success: boolean; candidate?: Candidate; message?: string }>;
   toggleAvailability: (isAvailable: boolean) => Promise<boolean>;
-  logout: () => void;
+  logout: (onDone?: () => void) => Promise<void>;
   refreshProfile: () => void;
 
   // Employer & Subscription Auth
@@ -47,7 +47,7 @@ interface AuthContextType {
   unlockedResumeCandidateIds: Set<string>;
   savedCandidateIds: Set<string>;
   employerLogin: (contactPersonName: string, companyName: string, phoneOrEmail: string, extra?: Partial<EmployerProfile>) => Promise<boolean>;
-  employerLogout: () => void;
+  employerLogout: (onDone?: () => void) => void;
   subscribePlan: (planId: string) => Promise<{ success: boolean; message: string }>;
   unlockContact: (candidateId: string) => Promise<{ success: boolean; message: string; candidate?: any; remainingAllowance?: number }>;
   unlockResume: (candidateId: string, action?: 'view' | 'download') => Promise<{ success: boolean; message: string; candidate?: any; remainingAllowance?: number; alreadyUnlocked?: boolean; error?: string }>;
@@ -136,38 +136,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Check local fallback session
-    const localSession = localDb.getAuthSession();
-    if (localSession && localSession.user_id) {
-      setUser({ id: localSession.user_id, phone: localSession.phone_number });
-      const c = localDb.getCandidateByUserId(localSession.user_id);
-      if (c) {
-        setCandidate(c);
+    try {
+      const localSession = localDb.getAuthSession();
+      if (localSession && localSession.user_id) {
+        setUser({ id: localSession.user_id, phone: localSession.phone_number || '' });
+        let c = localDb.getCandidateByUserId(localSession.user_id);
+        if (!c && localSession.phone_number) {
+          const cleanPhone = localSession.phone_number.replace(/[^0-9]/g, '');
+          const allCandidates = localDb.getCandidates();
+          c = allCandidates.find(cand => (cand.phone_number || '').replace(/[^0-9]/g, '') === cleanPhone) || null;
+          if (c) {
+            c.user_id = localSession.user_id;
+            localDb.saveCandidate(c);
+          }
+        }
+        if (c) {
+          setCandidate(c);
+        }
+
+        // Try syncing profile from centralized server
+        try {
+          const res = await fetch(`/api/candidates/user/${encodeURIComponent(localSession.user_id)}`);
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success && json.data) {
+              setCandidate(json.data);
+              localDb.saveCandidate(json.data);
+            }
+          }
+        } catch {}
       }
+    } catch (err) {
+      console.warn('Corrupted local candidate session:', err);
     }
 
     // Check local employer session
-    const localEmployer = localDb.getEmployerSession();
-    if (localEmployer) {
-      setEmployer(localEmployer);
-      const sub = localDb.getEmployerSubscription(localEmployer.id);
-      setEmployerSubscription(sub);
-
-      // Async sync with central database
-      api.getEmployerDashboard(localEmployer.id).then((dash) => {
-        if (dash) {
-          if (dash.employer) setEmployer(dash.employer);
-          if (dash.subscription) setEmployerSubscription(dash.subscription);
-          if (dash.unlocked_contacts) {
-            setUnlockedCandidateIds(new Set(dash.unlocked_contacts.map((u: any) => u.candidate_id)));
-          }
-          if (dash.unlocked_resumes) {
-            setUnlockedResumeCandidateIds(new Set(dash.unlocked_resumes.map((u: any) => u.candidate_id)));
-          }
-          if (dash.saved_candidates) {
-            setSavedCandidateIds(new Set(dash.saved_candidates.map((s: any) => s.candidate_id)));
-          }
+    try {
+      const localEmployer = localDb.getEmployerSession();
+      if (localEmployer && localEmployer.id) {
+        setEmployer(localEmployer);
+        const sub = localDb.getEmployerSubscription(localEmployer.id);
+        if (sub) {
+          setEmployerSubscription(sub);
         }
-      }).catch(() => {});
+
+        // Async sync with central database
+        api.getEmployerDashboard(localEmployer.id).then((dash) => {
+          if (dash) {
+            if (dash.employer) {
+              setEmployer(dash.employer);
+              localDb.setEmployerSession(dash.employer);
+            }
+            if (dash.subscription) {
+              setEmployerSubscription(dash.subscription);
+              localDb.setEmployerSubscription(dash.subscription);
+            }
+            if (dash.unlocked_contacts) {
+              setUnlockedCandidateIds(new Set(dash.unlocked_contacts.map((u: any) => u.candidate_id)));
+            }
+            if (dash.unlocked_resumes) {
+              setUnlockedResumeCandidateIds(new Set(dash.unlocked_resumes.map((u: any) => u.candidate_id)));
+            }
+            if (dash.saved_candidates) {
+              setSavedCandidateIds(new Set(dash.saved_candidates.map((s: any) => s.candidate_id)));
+            }
+          }
+        }).catch(() => {});
+      }
+    } catch (err) {
+      console.warn('Corrupted local employer session:', err);
     }
 
     setLoading(false);
@@ -190,6 +227,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.warn('Error fetching Supabase candidate:', e);
       }
     }
+
+    // Try central backend API
+    try {
+      const res = await fetch(`/api/candidates/user/${encodeURIComponent(userId)}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setCandidate(json.data);
+          localDb.saveCandidate(json.data);
+          return;
+        }
+      }
+    } catch {}
 
     // Fallback local check
     const c = localDb.getCandidateByUserId(userId);
@@ -536,7 +586,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const logout = async () => {
+  const logout = async (onDone?: () => void) => {
     if (isSupabaseConfigured && supabase) {
       try {
         await supabase.auth.signOut();
@@ -546,6 +596,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localDb.setAuthSession(null);
     setUser(null);
     setCandidate(null);
+    if (onDone) {
+      onDone();
+    }
   };
 
   const refreshProfile = () => {
@@ -614,12 +667,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const employerLogout = () => {
+  const employerLogout = (onDone?: () => void) => {
     localDb.setEmployerSession(null);
     setEmployer(null);
     setEmployerSubscription(null);
     setUnlockedCandidateIds(new Set());
+    setUnlockedResumeCandidateIds(new Set());
     setSavedCandidateIds(new Set());
+    if (onDone) {
+      onDone();
+    }
   };
 
   const subscribePlan = async (
