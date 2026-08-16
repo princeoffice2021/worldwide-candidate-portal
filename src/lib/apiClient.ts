@@ -41,6 +41,29 @@ export interface ApiArticleFilterParams {
   featured?: boolean;
 }
 
+// Safe helper to extract JSON data or fail safely without throwing SyntaxError
+async function safeParseJson<T = any>(res: Response): Promise<{ isJson: boolean; data: T | null; text?: string }> {
+  try {
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.toLowerCase().includes('application/json')) {
+      const text = await res.text().catch(() => '');
+      return { isJson: false, data: null, text };
+    }
+    const text = await res.text();
+    if (!text || !text.trim()) {
+      return { isJson: true, data: null };
+    }
+    try {
+      const data = JSON.parse(text) as T;
+      return { isJson: true, data };
+    } catch {
+      return { isJson: false, data: null, text };
+    }
+  } catch {
+    return { isJson: false, data: null };
+  }
+}
+
 export const api = {
   // Public Articles API (Published Only)
   async getArticles(params: ApiArticleFilterParams = {}): Promise<{ articles: BlogArticle[]; total: number }> {
@@ -61,13 +84,17 @@ export const api = {
       });
 
       if (!res.ok) {
-        throw new Error(`Failed to fetch articles (status ${res.status})`);
+        return { articles: [], total: 0 };
       }
 
-      const json = await res.json();
+      const parsed = await safeParseJson<{ data?: BlogArticle[]; total?: number }>(res);
+      if (!parsed.isJson || !parsed.data) {
+        return { articles: [], total: 0 };
+      }
+
       return {
-        articles: json.data || [],
-        total: json.total || 0
+        articles: parsed.data.data || [],
+        total: parsed.data.total || 0
       };
     } catch (err) {
       console.warn('API getArticles error, fallbacking to client store:', err);
@@ -83,8 +110,8 @@ export const api = {
       if (!res.ok) {
         return null;
       }
-      const json = await res.json();
-      return json.data || null;
+      const parsed = await safeParseJson<{ data?: BlogArticle }>(res);
+      return parsed.data?.data || null;
     } catch (err) {
       console.warn(`API getArticleBySlug (${slug}) error:`, err);
       return null;
@@ -103,8 +130,8 @@ export const api = {
         headers: getAuthHeaders()
       });
       if (!res.ok) return [];
-      const json = await res.json();
-      return json.data || [];
+      const parsed = await safeParseJson<{ data?: BlogArticle[] }>(res);
+      return parsed.data?.data || [];
     } catch {
       return [];
     }
@@ -115,8 +142,8 @@ export const api = {
     try {
       const res = await fetch('/api/topics');
       if (!res.ok) return [];
-      const json = await res.json();
-      return json.data || [];
+      const parsed = await safeParseJson<{ data?: BlogTopic[] }>(res);
+      return parsed.data?.data || [];
     } catch (err) {
       console.warn('API getTopics error:', err);
       return [];
@@ -128,8 +155,8 @@ export const api = {
     try {
       const res = await fetch('/api/career-guides');
       if (!res.ok) return [];
-      const json = await res.json();
-      return json.data || [];
+      const parsed = await safeParseJson<{ data?: CareerGuide[] }>(res);
+      return parsed.data?.data || [];
     } catch {
       return [];
     }
@@ -139,8 +166,8 @@ export const api = {
     try {
       const res = await fetch(`/api/career-guides/${encodeURIComponent(slug)}`);
       if (!res.ok) return null;
-      const json = await res.json();
-      return json.data || null;
+      const parsed = await safeParseJson<{ data?: CareerGuide }>(res);
+      return parsed.data?.data || null;
     } catch {
       return null;
     }
@@ -157,16 +184,39 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-      const data = await res.json();
+
+      const parsed = await safeParseJson<{ success?: boolean; token?: string; user?: any; error?: string }>(res);
+
+      if (!parsed.isJson || !parsed.data) {
+        return {
+          success: false,
+          error: 'Server authentication unavailable'
+        };
+      }
+
+      const data = parsed.data;
+
+      if (!res.ok) {
+        return {
+          success: false,
+          error: data.error || (res.status === 401 ? 'Invalid administrator credentials.' : 'Server authentication unavailable')
+        };
+      }
+
       if (data.success && data.token) {
         setStoredAdminToken(data.token);
         if (typeof window !== 'undefined' && data.user) {
           localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(data.user));
         }
       }
-      return data;
-    } catch (err: any) {
-      return { success: false, error: err.message || 'Network connection failed' };
+      return {
+        success: Boolean(data.success),
+        token: data.token,
+        user: data.user,
+        error: data.error
+      };
+    } catch {
+      return { success: false, error: 'Server authentication unavailable' };
     }
   },
 

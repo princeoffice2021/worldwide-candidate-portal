@@ -120,7 +120,7 @@ function generateAdminToken(): string {
 // AUTH API
 // ===================================================
 
-app.post('/api/auth/admin-login', (req: Request, res: Response) => {
+const handleAdminLogin = (req: Request, res: Response) => {
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).json({ success: false, error: 'Username and password are required.' });
@@ -154,7 +154,10 @@ app.post('/api/auth/admin-login', (req: Request, res: Response) => {
   }
 
   return res.status(401).json({ success: false, error: 'Invalid administrator credentials.' });
-});
+};
+
+app.post('/api/auth/admin-login', handleAdminLogin);
+app.post('/api/admin/auth/login', handleAdminLogin);
 
 app.get('/api/auth/admin-verify', (req: Request, res: Response) => {
   const isValid = verifyAdminToken(req);
